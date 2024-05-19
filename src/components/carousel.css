@@ -1,0 +1,14 @@
+.custom{
+    width: 100%;
+    height: 80vh;
+}
+.text-shadow{
+    text-shadow: -2px -2px 5px black, 2px -2px 5px black, -2px 2px 5px black, 2px 2px 5px black;
+    color: white;
+    
+}
+.text-shadow1{
+    text-shadow: 2px 2px 3px white;
+    color: black;
+    font-weight: 900;
+}

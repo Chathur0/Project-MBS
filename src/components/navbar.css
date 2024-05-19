@@ -1,0 +1,21 @@
+.navLink{
+    color: #05062d;
+  }
+  .navLinkEffect::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #05062d;
+    display: block;
+    margin: auto;
+    transition: 0.5s;
+}
+.navLinkEffect:hover::after {
+  width: 100%;
+}
+.invisible{
+  display: none;
+}
+.visible{
+  display: block;
+}
