@@ -16,8 +16,8 @@ export default function Carousel() {
       data-bs-interval="3000"
     >
       
-      <div class="carousel-inner">
-        <div class="carousel-item ">
+      <div class="carousel-inner ">
+        <div class="carousel-item active">
           <img src={p1} class="d-block w-100 custom" alt=".." />
           <div class="carousel-caption d-none d-md-block text-shadow">
             <h5 >Visit Sir Lanka</h5>

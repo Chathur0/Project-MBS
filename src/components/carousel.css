@@ -12,3 +12,15 @@
     color: black;
     font-weight: 900;
 }
+@media (max-width: 1024px) {
+    .custom {
+      height: 35vh;
+    }
+  }
+  
+  /* Media query for small screen size (e.g., smartphones) */
+  @media (max-width: 600px) {
+    .custom {
+      height: 25vh;
+    }
+  }
