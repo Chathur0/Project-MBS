@@ -1,4 +1,3 @@
-import "./footer.css";
 import logo from "/nav&footer/MBS LOGO_No Letters_1920x1080.png";
 import location from "/nav&footer/location.png";
 import phone from "/nav&footer/phone.png";
@@ -11,7 +10,7 @@ import {} from "bootstrap/dist/css/bootstrap.min.css";
 
 function Footer() {
   return (
-    <div className="container-fluid footer">
+    <div className="container-fluid " style={{backgroundColor:'#05062d'}}>
       <div className="container">
         <div className="row d-flex justify-content-center">
           <div className="col-sm-8 col-md-6 col-lg-5 col-xl-4 col-12 mb-5 mt-5">
@@ -145,7 +144,7 @@ function Footer() {
           </div>
         </div>
         <div className="row">
-          <hr className="custom-hr" />
+          <hr style={{border:'1px solid #ffffff', margin: '20px 0'}} />
           <div className="d-flex gap-3 mb-4">
             <a href="" className="text-white">Privacy Policy</a>
             <div className="text-white">|</div>

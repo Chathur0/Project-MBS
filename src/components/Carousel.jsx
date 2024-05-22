@@ -6,7 +6,6 @@ import p5 from "/carousel/p5.jpg";
 import p6 from "/carousel/p6.jpg";
 import p7 from "/carousel/p7.jpg";
 import p8 from "/carousel/p8.jpg";
-import "./carousel.css";
 export default function Carousel() {
   return (
     <div
@@ -15,13 +14,39 @@ export default function Carousel() {
       data-bs-ride="carousel"
       data-bs-interval="3000"
     >
-      
+      <style>{`.custom{
+    width: 100%;
+    height: 80vh;
+}
+.text-shadow{
+    text-shadow: -2px -2px 5px black, 2px -2px 5px black, -2px 2px 5px black, 2px 2px 5px black;
+    color: white;
+    
+}
+.text-shadow1{
+    text-shadow: 2px 2px 3px white;
+    color: black;
+    font-weight: 900;
+}
+@media (max-width: 1024px) {
+    .custom {
+      height: 35vh;
+    }
+  }
+  @media (max-width: 600px) {
+    .custom {
+      height: 25vh;
+    }
+  }`}</style>
       <div class="carousel-inner ">
         <div class="carousel-item active">
           <img src={p1} class="d-block w-100 custom" alt=".." />
           <div class="carousel-caption d-none d-md-block text-shadow">
-            <h5 >Visit Sir Lanka</h5>
-            <p >Discover the beautiful beaches of Sri Lanka. Your perfect coastal getaway awaits!</p>
+            <h5>Visit Sir Lanka</h5>
+            <p>
+              Discover the beautiful beaches of Sri Lanka. Your perfect coastal
+              getaway awaits!
+            </p>
           </div>
         </div>
         <div class="carousel-item">
@@ -42,7 +67,9 @@ export default function Carousel() {
           <img src={p4} class="d-block w-100 custom" alt="..." />
           <div class="carousel-caption d-none d-md-block text-shadow">
             <h5>Power of Meditation</h5>
-            <p>Experience the calming power of meditation and relax your mind.</p>
+            <p>
+              Experience the calming power of meditation and relax your mind.
+            </p>
           </div>
         </div>
         <div class="carousel-item">
@@ -56,21 +83,31 @@ export default function Carousel() {
           <img src={p6} class="d-block w-100 custom" alt="..." />
           <div class="carousel-caption d-none d-md-block text-shadow">
             <h5>Perfect Travel Accommodation</h5>
-            <p>Choose accommodation that offers freedom and comfort during your travels.</p>
+            <p>
+              Choose accommodation that offers freedom and comfort during your
+              travels.
+            </p>
           </div>
         </div>
         <div class="carousel-item">
           <img src={p7} class="d-block w-100 custom" alt="..." />
           <div class="carousel-caption d-none d-md-block text-shadow">
             <h5>Cinnamon Products</h5>
-            <p>Explore the essence of wellness with our premium cinnamon products from here.</p>
+            <p>
+              Explore the essence of wellness with our premium cinnamon products
+              from here.
+            </p>
           </div>
         </div>
         <div class="carousel-item">
           <img src={p8} class="d-block w-100 custom" alt="..." />
           <div class="carousel-caption d-none d-md-block text-shadow">
             <h5>Volunteer</h5>
-            <p>Stay at our MBS , help to MBS, and explore the beauty of the island. Join us in creating positive change and unforgettable experiences!</p>
+            <p>
+              Stay at our MBS , help to MBS, and explore the beauty of the
+              island. Join us in creating positive change and unforgettable
+              experiences!
+            </p>
           </div>
         </div>
       </div>
