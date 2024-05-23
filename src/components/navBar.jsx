@@ -62,15 +62,15 @@ function Nav() {
               <li className="nav-item">
                 <Link
                   to="/"
-                  className="nav-link fw-bold navLink navLinkEffect no-underline"
+                  className="nav-link fw-bold navLink navLinkEffect"
                 >
                   Home
                 </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link fw-bold navLink navLinkEffect" href="#">
+                <Link className="nav-link fw-bold navLink navLinkEffect" to="/about_us">
                   About
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
                 <a className="nav-link fw-bold navLink navLinkEffect" href="#">

@@ -22,10 +22,10 @@ export default function accommodation() {
   }`}</style>
       <Nav />
       <div className="container text-center mb-5">
-        <h6 className="mt-4">A PEACEFUL AND BEAUTIFUL STAY</h6>
-        <h2 className="m-2 fw-bolder" style={{ color: "#05062d" }}>
+        <h6 className="mt-5 mb-5">A PEACEFUL AND BEAUTIFUL STAY</h6>
+        <h3 className="mt-2 mb-2 fw-bolder" style={{ color: "#05062d" }}>
           ACCOMMODATION
-        </h2>
+        </h3>
         <p className="fw-semibold">
           Welcome to our peaceful Accommodation in Galle, where tranquility and
           comfort await you. Nestled amidst the beauty of nature, our
@@ -39,7 +39,7 @@ export default function accommodation() {
         <h3 style={{ fontWeight: "700", color: "#05062d", marginTop: "70px" }}>
           ROOMS
         </h3>
-        <p className="fw-semibold">
+        <p className="fw-semibold mb-5">
           Let your slip away and enjoy a blissful night of sleep
         </p>
         <div className="container">
