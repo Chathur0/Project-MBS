@@ -19,26 +19,26 @@ import Vi2 from "/volunteer-images/v2.jpg";
 import Vi3 from "/volunteer-images/v3.jpg";
 
 const Accommodation = [
-  { img: Ai1, name: "SINGLE ROOM" },
-  { img: Ai2, name: "DOUBLE ROOM" },
-  { img: Ai3, name: "TRIPLE ROOM" },
-  { img: Ai4, name: "FAMILY ROOM" },
+  { img: Ai1, name: "SINGLE ROOM",to:"single_room" },
+  { img: Ai2, name: "DOUBLE ROOM",to:"double_room" },
+  { img: Ai3, name: "TRIPLE ROOM",to:"triple_room" },
+  { img: Ai4, name: "FAMILY ROOM",to:"family_room" },
 ];
 const Product = [
-  { img: Pdi1, name: "CINNAMON OIL" },
-  { img: Pdi2, name: "CINNAMON POWDER" },
-  { img: Pdi3, name: "CINNAMON STICK" },
-  { img: Pdi4, name: "CINNAMON TEA" },
+  { img: Pdi1, name: "CINNAMON OIL",to:"" },
+  { img: Pdi2, name: "CINNAMON POWDER",to:""  },
+  { img: Pdi3, name: "CINNAMON STICK",to:""  },
+  { img: Pdi4, name: "CINNAMON TEA",to:""  },
 ];
 const Program = [
-  { img: Pi1, name: "YOGA" },
-  { img: Pi2, name: "MEDITATION" },
-  { img: Pi3, name: "SERMONS" },
+  { img: Pi1, name: "YOGA" ,to:"" },
+  { img: Pi2, name: "MEDITATION",to:""  },
+  { img: Pi3, name: "SERMONS" ,to:"" },
 ];
 const Volunteer = [
-  { img: Vi1, name: "" },
-  { img: Vi2, name: "" },
-  { img: Vi3, name: "" },
+  { img: Vi1, name: "" ,to:"" },
+  { img: Vi2, name: "" ,to:"" },
+  { img: Vi3, name: "" ,to:"" },
 ];
 let topicA = "ACCOMMODATION";
 let descriptionA =
@@ -61,9 +61,9 @@ export default function Home() {
       <div className="container mt-4 mb-4 ">
         <Button content="Admin" displayType="none" />
       </div>
-      <Viewer array={Accommodation} topic={topicA} description={descriptionA} needToGo="about Volunteer click"/>
-      <Viewer array={Program} topic={topicPg} description={descriptionP} needToGo="about Volunteer click"/>
-      <Viewer array={Product} topic={topicPd} description={descriptionPd} />
+      <Viewer array={Accommodation} topic={topicA} description={descriptionA} needToGo="about Volunteer click" type="/accommodation"/>
+      <Viewer array={Program} topic={topicPg} description={descriptionP} needToGo="about Volunteer click" type="/program"/>
+      <Viewer array={Product} topic={topicPd} description={descriptionPd} type="/product"/>
       <Viewer array={Volunteer} topic={topicV} description={descriptionV} />
       <Footer />
     </div>

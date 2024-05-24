@@ -58,7 +58,7 @@ function Responsive(props) {
       },
     ],
   };
-
+const type = props.type;
   return (
     <div className="slider-container container my-5 text-center">
       <style>
@@ -132,7 +132,7 @@ function Responsive(props) {
           <div key={index}>
             <img src={data.img} alt={data.name} className="img" />
             <div className="d-flex fw-bold text-white justify-content-end mx-3 position-relative text">
-              <p className="text-decoration-underline">{data.name}</p>
+              <Link to={`${type}/${data.to}`} className="text-decoration-underline text-white">{data.name}</Link>
             </div>
           </div>
         ))}

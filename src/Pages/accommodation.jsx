@@ -56,9 +56,12 @@ export default function accommodation() {
                   <p className="col-md-6 fw-bold d-flex justify-content-md-start justify-content-center col-12">
                     SINGLE ROOM
                   </p>
-                  <p className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12">
+                  <Link
+                    to="/accommodation/single_room"
+                    className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12 text-white"
+                  >
                     FIND OUT MORE
-                  </p>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -74,9 +77,12 @@ export default function accommodation() {
                   <p className="col-md-6 fw-bold d-flex justify-content-md-start justify-content-center col-12">
                     DOUBLE ROOM
                   </p>
-                  <p className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12">
+                  <Link
+                    to="/accommodation/double_room"
+                    className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12 text-white"
+                  >
                     FIND OUT MORE
-                  </p>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -92,9 +98,12 @@ export default function accommodation() {
                   <p className="col-md-6 fw-bold d-flex justify-content-md-start justify-content-center col-12">
                     TRIPLE ROOM
                   </p>
-                  <p className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12">
+                  <Link
+                    to="/accommodation/triple_room"
+                    className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12 text-white"
+                  >
                     FIND OUT MORE
-                  </p>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -110,9 +119,12 @@ export default function accommodation() {
                   <p className="col-md-6 fw-bold d-flex justify-content-md-start justify-content-center col-12">
                     FAMILY ROOM
                   </p>
-                  <p className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12">
+                  <Link
+                    to="/accommodation/family_room"
+                    className="text-decoration-underline col-md-6 fw-bold d-flex justify-content-md-end justify-content-center col-12 text-white"
+                  >
                     FIND OUT MORE
-                  </p>
+                  </Link>
                 </div>
               </div>
             </div>
