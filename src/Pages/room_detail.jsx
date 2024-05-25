@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
 import occupancy from "/icons/occupancy.png";
@@ -10,7 +10,7 @@ import i1 from "/room-images/i1.jpg";
 import i2 from "/room-images/i2.jpg";
 import i3 from "/room-images/i3.jpg";
 import Carousel from "../components/Carousel";
-import Button from '../components/button';
+import Button from "../components/button";
 const roomDetailsData = {
   single_room: {
     name: "SINGLE ROOM",
@@ -302,10 +302,7 @@ export default function RoomDetail() {
             </div>
           </div>
         </div>
-        <h3
-          className="mt-5 mb-4 fw-bolder "
-          style={{ color: "#05062d" }}
-        >
+        <h3 className="mt-5 mb-4 fw-bolder " style={{ color: "#05062d" }}>
           Accommodation Policy
         </h3>
         <p className="fw-semibold mb-5" style={{ color: "#05062d" }}>
@@ -319,7 +316,9 @@ export default function RoomDetail() {
           100% charge and late departures incur a 50% charge until 7.00 PM. A
           full day’s payment will be required for all departures after 7.00 PM{" "}
         </p>
-        <Button content="BOOK NOW"/> 
+        <Link to="/booking-process">
+          <Button content="BOOK NOW" />
+        </Link>
       </div>
       <Footer />
     </div>

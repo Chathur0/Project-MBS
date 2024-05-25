@@ -6,7 +6,7 @@ import About_us from './Pages/about_us';
 import Room_list from './Pages/room_list';
 import RoomDetail from './Pages/room_detail';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-
+import BookingProcess from './Pages/booking_process';
 function App() {
   return ( 
     <Router>
@@ -17,6 +17,7 @@ function App() {
         <Route path="/about_us" element={<About_us/>}></Route>
         <Route path="/accommodation/:type" element={<Room_list/>}></Route>
         <Route path="/accommodation/:type/:roomId" element={<RoomDetail/>}></Route>
+        <Route path="/booking-process" element={<BookingProcess/>}></Route>      
       </Routes>
     </Router>
   );
