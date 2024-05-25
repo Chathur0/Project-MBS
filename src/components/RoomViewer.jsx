@@ -9,9 +9,9 @@ import tv from "/icons/tv.png";
 import user from "/icons/user.png";
 import wm from "/icons/wm.png";
 import wifi from "/icons/wifi.png";
-import Button from "./button";
+import { Link } from "react-router-dom";
 
-export default function RoomViewer() {
+export default function RoomViewer(props) {
   return (
     <div className="container mt-5">
       <style>{`
@@ -29,7 +29,7 @@ export default function RoomViewer() {
           color: white;
           font-weight: 900;
           background-color: #3f7b48;
-          padding: 5px 50px 5px 50px;
+          padding: 0px 50px 0px 50px;
       }
       .btn-custom:hover{
           color: #3f7b48;
@@ -49,11 +49,7 @@ export default function RoomViewer() {
       `}</style>
       <div className="row bg-light d-flex justify-content-between wholeContainer border">
         <div className="col-12 col-md-6 col-lg-5 pe-0 ps-0">
-          <img
-            src={i1}
-            alt=""
-            className="w-100 img"
-          />
+          <img src={i1} alt="" className="w-100 img" />
         </div>
         <div className="col-12 col-md-6 col-lg-7 d-flex flex-column gap-3">
           <h3 className="mt-2 mb-2 fw-bolder ps-5" style={{ color: "#05062d" }}>
@@ -91,12 +87,14 @@ export default function RoomViewer() {
                 <img src={tv} alt="" width={20} height={20} />
               </div>
               <div className="col-12 col-sm-6 col-md-12 col-lg-6 d-flex mb-3 mt-3 mt-lg-4 ">
-                <button
-                  type="button"
-                  className="btn btn-custom ms-lg-auto ms-md-0 ms-0"
-                >
-                  MORE INFO
-                </button>
+                <Link to={`/accommodation/${props.type}/${props.roomId}`}>
+                  <button
+                    type="button"
+                    className="btn btn-custom ms-lg-auto ms-md-0 ms-0"
+                  >
+                    MORE INFO
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

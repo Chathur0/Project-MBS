@@ -1,32 +1,32 @@
 import React from "react";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
-import { useParams } from "react-router-dom";
+import { useParams,Link  } from "react-router-dom";
 import CheckAvailability from "../components/checkAvailability";
 import RoomViewer from "../components/RoomViewer";
 
 const roomDetailsData = {
-  single_room: {
-    name: "SINGLE ROOM",
-    description: "A comfortable room with basic amenities.",
-    // Other details can be added here
-  },
-  double_room: {
-    name: "DOUBLE ROOM",
-    description: "A luxurious room with premium amenities.",
-    // Other details can be added here
-  },
-  triple_room: {
-    name: "TRIPLE ROOM",
-    description: "A luxurious room with premium amenities.",
-    // Other details can be added here
-  },
-  family_room: {
-    name: "FAMILY ROOM",
-    description: "A spacious room with additional features.",
-    // Other details can be added here
-  },
-};
+    single_room: {
+      name: "SINGLE ROOM",
+      description: "A comfortable room with basic amenities.",
+      rooms: ["single_room_nm_01", "single_room_nm_02"],
+    },
+    double_room: {
+      name: "DOUBLE ROOM",
+      description: "A luxurious room with premium amenities.",
+      rooms: ["double_room_nm_01", "double_room_nm_02"],
+    },
+    triple_room: {
+      name: "TRIPLE ROOM",
+      description: "A spacious room with multiple beds.",
+      rooms: ["triple_room_nm_01", "triple_room_nm_02"],
+    },
+    family_room: {
+      name: "FAMILY ROOM",
+      description: "A spacious room with additional features.",
+      rooms: ["family_room_nm_01", "family_room_nm_02"],
+    },
+  };
 
 export default function room_list() {
   const { type } = useParams();
@@ -55,9 +55,9 @@ export default function room_list() {
       </div>
       <CheckAvailability />
       <div className="mb-5">
-        <RoomViewer />
-        <RoomViewer />
-        <RoomViewer />
+      {roomDetails.rooms.map((roomId, index) => (
+          <RoomViewer key={index} roomId={roomId} type={type} />
+        ))}
       </div>
       <Footer />
     </div>
