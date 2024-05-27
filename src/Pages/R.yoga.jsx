@@ -2,15 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useDropzone } from 'react-dropzone';
-import i1 from '/program/calender.jpeg'
-import i2 from '/program/meditate.jpeg'
-import i3 from '/program/meditate1.jpeg'
-import i4 from '/program/meditate2.jpeg'
-import i5 from '/program/profile.png'
-import i6 from '/program/slip.jpeg'
 import Nav from '../components/navBar'
 import Footer from '../components/footer'
 import { Link } from 'react-router-dom';
+
 
 
 const YogaRegistration = () => {
@@ -194,7 +189,7 @@ const YogaRegistration = () => {
         text-align: center;
         font-size: 12px;
       }
-      `}</style>
+      `}</style><Nav/>
     <div className="container">
       <fieldset>
         <h1>Register for Yoga</h1>
@@ -256,7 +251,11 @@ const YogaRegistration = () => {
         <button type="submit" className="submit-btn">Submit</button>
       </fieldset>
     </div>
+    
+    <div><Footer/></div>
+    
     </>
+    
   );
 };
 

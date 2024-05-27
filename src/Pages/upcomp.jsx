@@ -1,10 +1,4 @@
 import React, { useState } from 'react';
-import i1 from '/program/calender.jpeg'
-import i2 from '/program/meditate.jpeg'
-import i3 from '/program/meditate1.jpeg'
-import i4 from '/program/meditate2.jpeg'
-import i5 from '/program/profile.png'
-import i6 from '/program/slip.jpeg'
 import Nav from '../components/navBar'
 import Footer from '../components/footer'
 import { Link } from 'react-router-dom';
@@ -39,7 +33,8 @@ function AddPreviousPrograms() {
   };
 
   return (
-    <><style>{`.form-container {
+    <><style>{`
+    .form-container {
       width: 90%;
       max-width: 500px;
       margin: 0 auto;
@@ -51,7 +46,7 @@ function AddPreviousPrograms() {
     
     .form-container h2 {
       text-align: center;
-      color: #333; /* Darker gray for text */
+      color: #05062d; /* Darker gray for text */
     }
     
     .form-container label {
@@ -182,8 +177,9 @@ function AddPreviousPrograms() {
       }
     }
     
-    `}</style><div className="form-container">
-      <h2>ADD upcoming Programs</h2>
+    `}</style><Nav/>
+    <div className="form-container">
+      <h2><b>Add upcoming Programs</b></h2>
       <form onSubmit={handleSubmit}>
         <fieldset className="form-section">
           <div>
@@ -231,6 +227,7 @@ function AddPreviousPrograms() {
         <button type="button" className="program-button">Slip manage her</button>
         <button type="button"  className="program-button">Add previous programs</button>
       </div>
+      <Footer/>
       </>
   );
 }

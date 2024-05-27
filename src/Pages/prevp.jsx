@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Nav from '../components/navBar'
+import Footer from '../components/footer';
 
 function AddPreviousPrograms() {
   const [formData, setFormData] = useState({
@@ -30,7 +32,8 @@ function AddPreviousPrograms() {
 
   return (
     <>
-    <style>{`.form-container {
+    <style>{`
+    .form-container {
     width: 90%;
     max-width: 500px;
     margin: 0 auto;
@@ -42,7 +45,7 @@ function AddPreviousPrograms() {
   
   .form-container h2 {
     text-align: center;
-    color: #333; /* Darker gray for text */
+    color: #05062d; /* Darker gray for text */
   }
   
   .form-container label {
@@ -172,8 +175,9 @@ function AddPreviousPrograms() {
       font-size: 1em;
     }
   }
-   `}</style><div className="form-container">
-      <h2>ADD Previous Programs</h2>
+   `}</style><Nav/>
+   <div className="form-container">
+      <h2><b>Add Previous Programs</b></h2>
       <form onSubmit={handleSubmit}>
         <fieldset className="form-section">
           <div>
@@ -221,6 +225,7 @@ function AddPreviousPrograms() {
         <button type="button" className="program-button">Slip manage her</button>
         <button type="button"  className="program-button">Add upcoming programs</button>
       </div>
+      <Footer/>
       </>
   );
 }

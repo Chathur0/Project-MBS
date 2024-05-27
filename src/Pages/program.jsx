@@ -7,8 +7,21 @@ import i1 from '/program/calender.jpeg'
 import i2 from '/program/meditate.jpeg'
 import i3 from '/program/meditate1.jpeg'
 import i4 from '/program/meditate2.jpeg'
-import i5 from '/program/profile.png'
-import i6 from '/program/slip.jpeg'
+import i7 from '/program/meditate3.jpeg'
+import i8 from '/program/meditate4.jpeg'
+import i9 from '/program/meditate5.jpeg'
+import y1 from '/program/yoga.jpg'
+import y2 from '/program/yoga1.jpg'
+import y3 from '/program/yoga3.jpg'
+import y4 from '/program/yoga4.jpg'
+import y5 from '/program/yoga5.jpg'
+import y6 from '/program/yoga6.jpg'
+import s1 from '/program/sermon.jpeg'
+import s2 from '/program/sermon1.jpeg'
+import s3 from '/program/sermon2.jpeg'
+import s4 from '/program/sermon3.jpeg'
+import s5 from '/program/sermon4.jpeg'
+import s6 from '/program/sermon5.jpeg'
 import Nav from '../components/navBar'
 import Footer from '../components/footer'
 import { Link } from 'react-router-dom';
@@ -60,19 +73,95 @@ function App() {
     },
     {
       name: '23/06/2023',
-      img: i2,
+      img: i7,
       review: 'The deshana about abhidharma',
 
     },
     {
       name: '24/06/2023',
-      img: i3,
+      img: i8,
       review: 'The deshana about abhidharma',
 
     },
     {
       name: '25/06/2023',
-      img: i4,
+      img: i9,
+      review: 'The deshana about abhidharma',
+
+    },
+  ];
+  const data1 = [
+    {
+      name: '20/06/2023',
+      img: y1,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '21/06/2023',
+      img: y3,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '22/06/2023',
+      img: y4,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '23/06/2023',
+      img: y5,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '24/06/2023',
+      img: y6,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '25/06/2023',
+      img: y2,
+      review: 'The deshana about abhidharma',
+
+    },
+  ];
+  const data2 = [
+    {
+      name: '20/06/2023',
+      img: s1,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '21/06/2023',
+      img: s2,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '22/06/2023',
+      img: s3,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '23/06/2023',
+      img:s4,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '24/06/2023',
+      img: s5,
+      review: 'The deshana about abhidharma',
+
+    },
+    {
+      name: '25/06/2023',
+      img: s6,
       review: 'The deshana about abhidharma',
 
     },
@@ -337,7 +426,7 @@ function App() {
         <div className="container">
           <div className="slider-wrapper">
             <Slider {...settings}>
-              {data.map((d, index) => (
+              {data1.map((d, index) => (
                 <div key={index} className="slide">
                   <div className="image-container">
                     <img src={d.img} alt={d.name} className="image" />
@@ -371,7 +460,7 @@ function App() {
         <div className="container">
           <div className="slider-wrapper">
             <Slider {...settings}>
-              {data.map((d, index) => (
+              {data2.map((d, index) => (
                 <div key={index} className="slide">
                   <div className="image-container">
                     <img src={d.img} alt={d.name} className="image" />

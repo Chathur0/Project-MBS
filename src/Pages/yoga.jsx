@@ -2,12 +2,12 @@ import React from 'react';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import i1 from '/program/calender.jpeg'
-import i2 from '/program/meditate.jpeg'
-import i3 from '/program/meditate1.jpeg'
-import i4 from '/program/meditate2.jpeg'
-import i5 from '/program/profile.png'
-import i6 from '/program/slip.jpeg'
+import y1 from '/program/yoga.jpg'
+import y2 from '/program/yoga1.jpg'
+import y3 from '/program/yoga3.jpg'
+import y4 from '/program/yoga4.jpg'
+import y5 from '/program/yoga5.jpg'
+import y6 from '/program/yoga6.jpg'
 import Nav from '../components/navBar'
 import Footer from '../components/footer'
 import { Link } from 'react-router-dom';
@@ -43,54 +43,51 @@ function App() {
   const data = [
     {
       type: 'video',
-      url: 'https://www.youtube.com/embed/xNRJwmlRBNU',
+      url: 'https://youtu.be/G4O3sV5M6HQ',
       title: 'First video',
       review: 'The deshana about abhidharma',
       name: '20/06/2023',
     },
-    {
-      type: 'image',
-      name: '20/06/2023',
-      img: i2,
-      review: 'The deshana about abhidharma',
-
-    },
-    {
-      type: 'image',
-      name: '20/06/2023',
-      img: i3,
-      review: 'The deshana about abhidharma',
-
-    },
-    {
-      type: 'image',
-      name: '20/06/2023',
-      img: i4,
-      review: 'The deshana about abhidharma',
-
-    },
+   
+      {
+        name: '20/06/2023',
+        img: y1,
+        review: 'The deshana about abhidharma',
+  
+      },
+      {
+        name: '21/06/2023',
+        img: y3,
+        review: 'The deshana about abhidharma',
+  
+      },
+      {
+        name: '22/06/2023',
+        img: y4,
+        review: 'The deshana about abhidharma',
+  
+      },
+     
+    
     // Add more data items as needed
   ];
   const data1 = [
 
     {
-      type: 'image',
-      name: '20/06/2023',
-      img: i2,
+      name: '23/06/2023',
+      img: y5,
       review: 'The deshana about abhidharma',
 
     },
     {
-      type: 'image',
-      name: '20/06/2023',
-      img: i3,
+      name: '24/06/2023',
+      img: y6,
       review: 'The deshana about abhidharma',
 
     },
     {
-      type: 'image',
-      name: '20/06/2023',
-      img:i4,
+      name: '25/06/2023',
+      img: y2,
       review: 'The deshana about abhidharma',
 
     },
@@ -302,7 +299,7 @@ function App() {
           width: 100%;
         }
       }
-`}</style>
+`}</style><Nav/>
       <div className="heading1">
         <h1>Yoga</h1>
       </div>
@@ -418,6 +415,7 @@ function App() {
       <Link to="/accommodation">
         <button className='Accomodation'>Accomodation</button>
       </Link>
+      <Footer/>
     </>
   );
 }

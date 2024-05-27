@@ -6,7 +6,7 @@ import Meditation from './Pages/medi';
 import AddPreviousPrograms from './Pages/prevp';
 import RegisterY from './Pages/R.yoga';
 import UpcomingP from './Pages/upcomp';
-
+import AddPrograms from "./Pages/Addprev";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -17,9 +17,10 @@ function App() {
         <Route path="/meditation" element={<Meditation />}></Route>
         <Route path="/yoga" element={<Yoga />}></Route>
         <Route path="/sermons" element={<Sermons />}></Route>
-        <Route path="prevp" element={<AddPreviousPrograms />}></Route>
+        <Route path="Addpreviousp" element={<AddPreviousPrograms />}></Route>
         <Route path="/R.yoga" element={<RegisterY />}></Route>
-        <Route path="/upcomp" element={<UpcomingP />}></Route>
+        <Route path="/upcommingp" element={<UpcomingP />}></Route>
+        <Route path="/AddminP" element={<AddPrograms />}></Route>
         
       </Routes>
     </Router>

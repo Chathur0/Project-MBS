@@ -2,12 +2,12 @@ import React from 'react';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import i1 from '/program/calender.jpeg'
 import i2 from '/program/meditate.jpeg'
 import i3 from '/program/meditate1.jpeg'
 import i4 from '/program/meditate2.jpeg'
-import i5 from '/program/profile.png'
-import i6 from '/program/slip.jpeg'
+import i7 from '/program/meditate3.jpeg'
+import i8 from '/program/meditate4.jpeg'
+import i9 from '/program/meditate5.jpeg'
 import Nav from '../components/navBar'
 import Footer from '../components/footer'
 import { Link } from 'react-router-dom';
@@ -42,7 +42,7 @@ function App() {
   const data = [
     {
       type: 'video',
-      url: 'https://www.youtube.com/embed/xNRJwmlRBNU',
+      url: 'https://youtu.be/ZToicYcHIOU',
       title: 'First video',
       review: 'The deshana about abhidharma',
       name: '20/06/2023',
@@ -75,21 +75,21 @@ function App() {
     {
       type: 'image',
       name: '20/06/2023',
-      img: i2,
+      img: i7,
       review: 'The deshana about abhidharma',
 
     },
     {
       type: 'image',
       name: '20/06/2023',
-      img: i3,
+      img: i8,
       review: 'The deshana about abhidharma',
 
     },
     {
       type: 'image',
       name: '20/06/2023',
-      img: i4,
+      img: i9,
       review: 'The deshana about abhidharma',
 
     },
@@ -302,7 +302,7 @@ function App() {
       width: 100%;
     }
   }
-`}</style>
+`}</style><Nav/>
       <div className="heading1">
         <h1>Meditation</h1>
       </div>
@@ -420,7 +420,7 @@ function App() {
       <Link to="/accommodation">
         <button className='Accomodation'>Accomodation</button>
       </Link>
-
+<Footer/>
     </>
   );
 }
