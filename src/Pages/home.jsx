@@ -25,6 +25,7 @@ import Pdi4 from "/product-images/tea.jpg";
 import Vi1 from "/volunteer-images/v1.jpg";
 import Vi2 from "/volunteer-images/v2.jpg";
 import Vi3 from "/volunteer-images/v3.jpg";
+import { Link } from "react-router-dom";
 const carouselDetails = [
   {
     image: p1,
@@ -114,7 +115,9 @@ export default function Home() {
       <Nav />
       <Carousel details={carouselDetails} />
       <div className="container mt-4 mb-4 ">
-        <Button content="Admin" displayType="none" />
+        <Link to="/accommodation-admin/booked-room" className="text-decoration-none">
+          <Button content="Admin" displayType="block" />
+        </Link>
       </div>
       <Viewer
         array={Accommodation}

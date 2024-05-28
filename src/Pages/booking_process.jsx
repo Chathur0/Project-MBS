@@ -60,16 +60,17 @@ export default function BookingProcess() {
         font-weight: 900;
         background-color: #3f7b48;
     }
-    .btn-custom1{
-      color: white;
-      font-weight: 900;
-      background-color: #3f7b48;
-  }
+    
     .btn-custom:hover{
         color: #3f7b48;
         background-color: white;
         border: 2px solid #3f7b48;
     }  
+    .btn-custom1{
+      color: white;
+      font-weight: 900;
+      background-color: #3f7b48;
+  }
     .wrapper{
       position: "relative";
       overflow: "hidden";

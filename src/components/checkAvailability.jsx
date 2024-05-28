@@ -182,7 +182,7 @@ const BookingForm = () => {
                       }
                     >
                       <option value="">Select Age</option>
-                      {[...Array(18)].map((_, age) => (
+                      {[...Array(13)].map((_, age) => (
                         <option key={age} value={age}>
                           {age}
                         </option>
