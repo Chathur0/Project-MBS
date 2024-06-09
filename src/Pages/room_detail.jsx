@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
+import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
@@ -11,99 +12,8 @@ import i2 from "/room-images/i2.jpg";
 import i3 from "/room-images/i3.jpg";
 import Carousel from "../components/Carousel";
 import Button from "../components/button";
-const roomDetailsData = {
-  single_room: {
-    name: "SINGLE ROOM",
-    description: "A comfortable room with basic amenities.",
-    rooms: [
-      {
-        id: "single_room_nm_01",
-        name: "Single Room nm 01",
-        description: "A cozy single room perfect for solo travelers.",
-        image: "/accommodation-images/single_room_nm_01.jpg",
-        details: "Details about single room nm 01...",
-      },
-      {
-        id: "single_room_nm_02",
-        name: "Single Room nm 02",
-        description: "A cozy single room perfect for solo travelers.",
-        image: "/accommodation-images/single_room_nm_02.jpg",
-        details: "Details about single room nm 02...",
-      },
-    ],
-  },
-  double_room: {
-    name: "DOUBLE ROOM",
-    description: "A luxurious room with premium amenities.",
-    rooms: [
-      {
-        id: "double_room_nm_01",
-        name: "Double Room nm 01",
-        description: "A luxurious room with two beds.",
-        image: "/accommodation-images/double_room_nm_01.jpg",
-        details: "Details about double room nm 01...",
-      },
-      {
-        id: "double_room_nm_02",
-        name: "Double Room nm 02",
-        description: "A luxurious room with two beds.",
-        image: "/accommodation-images/double_room_nm_02.jpg",
-        details: "Details about double room nm 02...",
-      },
-    ],
-  },
-  triple_room: {
-    name: "TRIPLE ROOM",
-    description: "A spacious room with multiple beds.",
-    rooms: [
-      {
-        id: "triple_room_nm_01",
-        name: "Triple Room nm 01",
-        description: "A spacious room with three beds.",
-        image: "/accommodation-images/triple_room_nm_01.jpg",
-        details: "Details about triple room nm 01...",
-      },
-      {
-        id: "triple_room_nm_02",
-        name: "Triple Room nm 02",
-        description: "A spacious room with three beds.",
-        image: "/accommodation-images/triple_room_nm_02.jpg",
-        details: "Details about triple room nm 02...",
-      },
-    ],
-  },
-  family_room: {
-    name: "FAMILY ROOM",
-    description: "A spacious room with additional features.",
-    rooms: [
-      {
-        id: "family_room_nm_01",
-        name: "Family Room nm 01",
-        description: "A large room suitable for families.",
-        image: "/accommodation-images/family_room_nm_01.jpg",
-        details: "Details about family room nm 01...",
-      },
-      {
-        id: "family_room_nm_02",
-        name: "Family Room nm 02",
-        description: "A large room suitable for families.",
-        image: "/accommodation-images/family_room_nm_02.jpg",
-        details: "Details about family room nm 02...",
-      },
-    ],
-  },
-};
-// const roomDetails = {
-//     image: [i1,i2,i3],
-//     details : {
-//         "name" : "Family Room nm 01",
-//         "description" : "Welcome to our Family Room nm 01! This air-conditioned room offers a cozy and comfortable stay for your family. Adorned with beautiful decorations and equipped with the latest technology, it ensures a delightful experience. The room features two double beds along with a single bed, and we can readily provide extra beds upon request. With space for up to 3 adults and 2 children, or more if needed, it's perfect for families of all sizes. Enjoy a relaxing stay with us!",
-//         "image" : "/accommodation-images/family_room_nm_01.jpg",
-//         "details" : "Details about family room nm 01..."
-//     }
-// };
-// const carousalImages = roomDetails.image.map((img) => ({ image: img }));
-// convert array into array object ^
+
+
 const roomDetails = {
   image: { i1, i2, i3 },
   details: {
@@ -159,26 +69,73 @@ const carousalImages = Object.values(roomDetails.image).map((img) => ({
 
 export default function RoomDetail() {
   const { type, roomId } = useParams();
-  const roomCategory = roomDetailsData[type];
-  const room = roomCategory.rooms.find((r) => r.id === roomId);
+  const [roomDetails, setRoomDetails] = useState({
+    roomNumber: "",
+    roomType: "",
+    area: "",
+    capacity: "",
+    pricePerDay: "",
+    description: "",
+    view: "",
+  });
+  const [headlines, setHeadlines] = useState([""]);
+  const [technologies, setTechnologies] = useState([""]);
+  const [services, setServices] = useState([""]);
+  const [beds, setBeds] = useState([""]);
+  const [baths, setBaths] = useState([""]);
+  const [images, setImages] = useState([]);
+  
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/accommodation/getRoom/${roomId}`)
+      .then((response) => {
+        if (response.data.Status === "Success") {
+          const data = response.data.data;
+          setRoomDetails({
+            roomNumber: `${data.type.charAt(0).toUpperCase() + data.type.slice(1)} nm ${
+              data.r_name
+            }`,
+            roomType: data.type,
+            area: data.area,
+            capacity: `${JSON.parse(data.capacity).Adult} Adult & ${JSON.parse(data.capacity).Child} Child`,
+            pricePerDay: data.price,
+            description: data.r_discription,
+            view: data.view,
+          });
 
-  if (!room) {
-    return <h2>Room not found</h2>;
-  }
+          setHeadlines(JSON.parse(JSON.parse(data.r_highlight)));
+          setTechnologies(JSON.parse(JSON.parse(data.technology)));
+          setServices(JSON.parse(JSON.parse(data.services)));
+          setBeds(JSON.parse(JSON.parse(data.bed_details)));
+          setBaths(JSON.parse(JSON.parse(data.bath_details)));
+          const imagePaths = JSON.parse(data.image).map(
+            (img) => `http://localhost:3000/A_images/${img}`
+          );
+          setImages(imagePaths);
+        } else {
+          console.error("Failed to fetch room details:", response.data.Message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching room details:", error);
+      });
+  }, [roomId]);
+
+  const imagesArray = images.map(url => ({ image: url }));
 
   return (
     <div>
       <Nav />
       <div className="container text-center mt-5 mb-5">
         <h3 className="mt-2 mb-2 fw-bolder" style={{ color: "#05062d" }}>
-          {roomDetails.details.name}
+          {roomDetails.roomNumber}
         </h3>
-        <p className="fw-semibold mt-5">{roomDetails.details.description}</p>
+        <p className="fw-semibold mt-5">{roomDetails.description}</p>
         <div className="row mt-5">
           <div className="col-12 col-md-6 col-xl-4 d-flex justify-content-center gap-2 align-items-center">
             <img src={area} alt="" width={50} height={50} />
             <div className="d-inline-block" style={{ color: "#05062d" }}>
-              <h3>{roomDetails.details.area}</h3>
+              <h3>{roomDetails.area}</h3>
               <p>SQFT</p>
             </div>
           </div>
@@ -186,14 +143,14 @@ export default function RoomDetail() {
             <img src={occupancy} alt="" width={50} height={50} />
             <div className="d-inline-block" style={{ color: "#05062d" }}>
               <h5>OCCUPANCY</h5>
-              <h4 className="fw-bold">{roomDetails.details.occupancy}</h4>
+              <h4 className="fw-bold">{roomDetails.capacity}</h4>
             </div>
           </div>
           <div className="col-12 col-xl-4 d-flex justify-content-center gap-2 align-items-center mt-3 mt-xl-0">
             <img src={price} alt="" width={50} height={50} />
             <div className="d-inline-block" style={{ color: "#05062d" }}>
               <h5>PRICE PER DAY</h5>
-              <h4 className="fw-bold">{roomDetails.details.price}</h4>
+              <h4 className="fw-bold">{roomDetails.pricePerDay}</h4>
             </div>
             <div className="d-flex align-items-center">
               <button className="btn">
@@ -209,7 +166,7 @@ export default function RoomDetail() {
         <div className="mt-5 mb-3">
           <BookingForm />
         </div>
-        <Carousel details={carousalImages} />
+        <Carousel details={imagesArray} />
         <div className="border mt-5 rounded-3 bg-light">
           <h3
             className="mt-5 mb-4 fw-bolder text-start ps-5"
@@ -219,7 +176,7 @@ export default function RoomDetail() {
           </h3>
           <div className="container">
             <div className="row mb-5" style={{ color: "#05062d" }}>
-              {roomDetails.details.headline.map((data) => {
+              {headlines.map((data) => {
                 return (
                   <div className="col-12 col-md-6 text-start fw-semibold ps-5">
                     {data}
@@ -235,7 +192,7 @@ export default function RoomDetail() {
             VIEW
           </h5>
           <p className=" fw-semibold text-start ps-5">
-            {roomDetails.details.view}
+            {roomDetails.view}
           </p>
         </div>
         <div className="border mt-4 rounded-3 bg-light">
@@ -247,7 +204,7 @@ export default function RoomDetail() {
           </h3>
           <div className="container">
             <div className="row mb-5" style={{ color: "#05062d" }}>
-              {roomDetails.details.technology.map((data) => {
+              {technologies.map((data) => {
                 return (
                   <div className="col-12 col-md-6 text-start fw-semibold ps-5">
                     {data}
@@ -266,7 +223,7 @@ export default function RoomDetail() {
           </h3>
           <div className="container">
             <div className="row mb-5" style={{ color: "#05062d" }}>
-              {roomDetails.details.service.map((data) => {
+              {services.map((data) => {
                 return (
                   <div className="col-12 col-md-6 text-start fw-semibold ps-5">
                     {data}
@@ -285,7 +242,7 @@ export default function RoomDetail() {
               >
                 BED
               </h3>
-              {roomDetails.details.bed.map((data) => {
+              {beds.map((data) => {
                 return <div className="w-100 fw-semibold">{data}</div>;
               })}
             </div>
@@ -296,7 +253,7 @@ export default function RoomDetail() {
               >
                 BATH
               </h3>
-              {roomDetails.details.bath.map((data) => {
+              {baths.map((data) => {
                 return <div className="w-100 fw-semibold">{data}</div>;
               })}
             </div>

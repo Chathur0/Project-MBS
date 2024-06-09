@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 const predefinedHeadlines = [
   "Tea & Coffee maker",
   "Complimentary mineral water",
@@ -52,7 +54,6 @@ const predefinedTechnologies = [
   "Personalized wake-up call service",
   "Laptop-sized safe",
   "Soundproofing for peaceful sleep",
-  "Panoramic city or sea view",
 ];
 
 const predefinedServices = [
@@ -113,6 +114,35 @@ function AddRoom() {
   const [baths, setBaths] = useState([""]);
   const [images, setImages] = useState([]);
   const [mainImage, setMainImage] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeField, setActiveField] = useState({ type: null, index: null });
+  const [auth, setAuth] = useState(false);
+  const [user, setUser] = useState({ userId: "", name: "" });
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    } else {
+      axios
+        .get("http://localhost:3000/checkToken", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          if (res.data.valid) {
+            setAuth(true);
+            setUser({ userId: res.data.userId, name: res.data.name });
+          } else {
+            setAuth(false);
+            navigate("/login");
+          }
+        })
+        .catch((err) =>{
+          setAuth(false);
+          console.log(err)});
+    }
+  }, [navigate]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -150,23 +180,113 @@ function AddRoom() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = {
-      ...roomDetails,
-      headlines,
-      technologies,
-      services,
-      beds,
-      baths,
-      mainImage,
-      images,
-    };
-    console.log(formData);
+    const formData = new FormData();
+
+    formData.append("roomNumber", roomDetails.roomNumber);
+    formData.append("roomType", roomDetails.roomType);
+    formData.append("area", roomDetails.area);
+    formData.append("capacityAdult", roomDetails.capacityAdult);
+    formData.append("capacityChild", roomDetails.capacityChild);
+    formData.append("pricePerDay", roomDetails.pricePerDay);
+    formData.append("description", roomDetails.description);
+    formData.append("view", roomDetails.view);
+    formData.append("headlines", JSON.stringify(headlines));
+    formData.append("technologies", JSON.stringify(technologies));
+    formData.append("services", JSON.stringify(services));
+    formData.append("beds",JSON.stringify(beds));
+    formData.append("baths",JSON.stringify(baths));
+
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/accommodation/addRoom",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const result = response.data;
+      if (result.Status === "Success") {
+        alert("Room added successfully");
+        location.reload();
+      } else {
+        alert("Failed to add room: " + result.Message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while adding the room");
+    }
+  };
+  const handleSuggestionClick = (setter, fields, index, value) => {
+    handleFieldChange(setter, fields, index, value);
+    setActiveField({ type: null, index: null });
   };
 
+  const handleInputFocus = (type, index) => {
+    setActiveField({ type, index });
+  };
+
+  useEffect(() => {
+    if (activeField.type !== null) {
+      const fields =
+        activeField.type === "headlines"
+          ? headlines
+          : activeField.type === "technologies"
+          ? technologies
+          : activeField.type === "services"
+          ? services
+          : activeField.type === "beds"
+          ? beds
+          : baths;
+
+      const predefined =
+        activeField.type === "headlines"
+          ? predefinedHeadlines
+          : activeField.type === "technologies"
+          ? predefinedTechnologies
+          : activeField.type === "services"
+          ? predefinedServices
+          : activeField.type === "beds"
+          ? predefinedBedDetails
+          : predefinedBathDetails;
+
+      const currentInput = fields[activeField.index].toLowerCase();
+      const filteredSuggestions = predefined.filter((item) =>
+        item.toLowerCase().includes(currentInput)
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  }, [activeField, headlines, technologies, services, beds, baths]);
+
+  const handleOutsideClick = (e) => {
+    if (!e.target.closest(".suggestions-container")) {
+      setActiveField({ type: null, index: null });
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
   return (
     <div className="container text-center">
+      <style>{`
+      .suggestion-item:hover{
+        cursor: pointer;
+        background-color: rgb(235, 235, 235);
+    }    
+      `}</style>
       <h2 style={{ color: "#05062d" }} className="mb-5">
         Add Room
       </h2>
@@ -191,6 +311,7 @@ function AddRoom() {
                 value={roomDetails.roomNumber}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               />
             </div>
           </div>
@@ -207,14 +328,15 @@ function AddRoom() {
                 value={roomDetails.roomType}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               >
                 <option value="" disabled hidden>
                   Choose room type
                 </option>
-                <option value="single room">Single Room</option>
-                <option value="double room">Double Room</option>
-                <option value="triple room">Triple Room</option>
-                <option value="family room">Family Room</option>
+                <option value="Single Room">Single Room</option>
+                <option value="Double Room">Double Room</option>
+                <option value="Triple Room">Triple Room</option>
+                <option value="Family Room">Family Room</option>
               </select>
             </div>
           </div>
@@ -233,6 +355,7 @@ function AddRoom() {
                 value={roomDetails.area}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               />
             </div>
           </div>
@@ -249,6 +372,7 @@ function AddRoom() {
                 value={roomDetails.capacityAdult}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               >
                 <option value="" disabled hidden>
                   Adult
@@ -264,6 +388,7 @@ function AddRoom() {
                 value={roomDetails.capacityChild}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               >
                 <option value="" disabled hidden>
                   Child
@@ -291,6 +416,7 @@ function AddRoom() {
                 value={roomDetails.pricePerDay}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               />
             </div>
           </div>
@@ -307,7 +433,8 @@ function AddRoom() {
                 name="description"
                 value={roomDetails.description}
                 onChange={handleInputChange}
-                style={{ color: "#05062d", fontWeight: "600" }}
+                style={{ color: "#05062d", fontWeight: "600",height: "100px" }}
+                required
               />
             </div>
           </div>
@@ -326,6 +453,7 @@ function AddRoom() {
                 value={roomDetails.view}
                 onChange={handleInputChange}
                 style={{ color: "#05062d", fontWeight: "600" }}
+                required
               />
             </div>
           </div>
@@ -337,21 +465,52 @@ function AddRoom() {
           {headlines.map((headline, index) => (
             <div className="row text-start mt-3 d-flex" key={index}>
               <div className="col-12 d-flex">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Enter Details Highlighting The Key Features Of The Room"
-                  value={headline}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      setHeadlines,
-                      headlines,
-                      index,
-                      e.target.value
-                    )
-                  }
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                />
+                <div className="w-100">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Details Highlighting The Key Features Of The Room"
+                    value={headline}
+                    onFocus={() => handleInputFocus("headlines", index)}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        setHeadlines,
+                        headlines,
+                        index,
+                        e.target.value
+                      )
+                    }
+                    style={{ color: "#05062d", fontWeight: "600" }}
+                    required
+                  />
+                  {activeField.type === "headlines" &&
+                    activeField.index === index && (
+                      <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                        {suggestions.length > 0 ? (
+                          suggestions.map((suggestion, i) => (
+                            <div
+                              key={i}
+                              className="suggestion-item px-2"
+                              onClick={() =>
+                                handleSuggestionClick(
+                                  setHeadlines,
+                                  headlines,
+                                  index,
+                                  suggestion
+                                )
+                              }
+                            >
+                              {suggestion}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="suggestion-item px-2">
+                            No suggestions found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                </div>
                 <button
                   type="button"
                   className="btn btn-danger ms-2"
@@ -379,21 +538,52 @@ function AddRoom() {
           {technologies.map((technology, index) => (
             <div className="row text-start mt-3 d-flex" key={index}>
               <div className="col-12 d-flex">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Enter Details Technology Features Of The Room"
-                  value={technology}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      setTechnologies,
-                      technologies,
-                      index,
-                      e.target.value
-                    )
-                  }
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                />
+                <div className="w-100">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Details Technology Features Of The Room"
+                    value={technology}
+                    onFocus={() => handleInputFocus("technologies", index)}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        setTechnologies,
+                        technologies,
+                        index,
+                        e.target.value
+                      )
+                    }
+                    style={{ color: "#05062d", fontWeight: "600" }}
+                    required
+                  />
+                  {activeField.type === "technologies" &&
+                    activeField.index === index && (
+                      <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                        {suggestions.length > 0 ? (
+                          suggestions.map((suggestion, i) => (
+                            <div
+                              key={i}
+                              className="suggestion-item px-2"
+                              onClick={() =>
+                                handleSuggestionClick(
+                                  setTechnologies,
+                                  technologies,
+                                  index,
+                                  suggestion
+                                )
+                              }
+                            >
+                              {suggestion}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="suggestion-item px-2">
+                            No suggestions found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                </div>
                 <button
                   type="button"
                   className="btn btn-danger ms-2"
@@ -421,21 +611,51 @@ function AddRoom() {
           {services.map((service, index) => (
             <div className="row text-start mt-3 d-flex" key={index}>
               <div className="col-12 d-flex">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Enter Services That Will Be Provided"
-                  value={service}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      setServices,
-                      services,
-                      index,
-                      e.target.value
-                    )
-                  }
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                />
+                <div className="w-100">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Services That Will Be Provided"
+                    value={service}
+                    onFocus={() => handleInputFocus("services", index)}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        setServices,
+                        services,
+                        index,
+                        e.target.value
+                      )
+                    }
+                    style={{ color: "#05062d", fontWeight: "600" }}
+                  />
+                  {activeField.type === "services" &&
+                    activeField.index === index && (
+                      <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                        {suggestions.length > 0 ? (
+                          suggestions.map((suggestion, i) => (
+                            <div
+                              key={i}
+                              className="suggestion-item px-2"
+                              onClick={() =>
+                                handleSuggestionClick(
+                                  setServices,
+                                  services,
+                                  index,
+                                  suggestion
+                                )
+                              }
+                            >
+                              {suggestion}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="suggestion-item px-2">
+                            No suggestions found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                </div>
                 <button
                   type="button"
                   className="btn btn-danger ms-2"
@@ -463,16 +683,47 @@ function AddRoom() {
           {beds.map((bed, index) => (
             <div className="row text-start mt-3 d-flex" key={index}>
               <div className="col-12 d-flex">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Enter Details Of The Bed Features"
-                  value={bed}
-                  onChange={(e) =>
-                    handleFieldChange(setBeds, beds, index, e.target.value)
-                  }
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                />
+                <div className="w-100">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Details Of The Bed Features"
+                    value={bed}
+                    onFocus={() => handleInputFocus("beds", index)}
+                    onChange={(e) =>
+                      handleFieldChange(setBeds, beds, index, e.target.value)
+                    }
+                    style={{ color: "#05062d", fontWeight: "600" }}
+                    required
+                  />
+                  {activeField.type === "beds" &&
+                    activeField.index === index && (
+                      <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                        {suggestions.length > 0 ? (
+                          suggestions.map((suggestion, i) => (
+                            <div
+                              key={i}
+                              className="suggestion-item px-2"
+                              onClick={() =>
+                                handleSuggestionClick(
+                                  setBeds,
+                                  beds,
+                                  index,
+                                  suggestion
+                                )
+                              }
+                            >
+                              {suggestion}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="suggestion-item px-2">
+                            No suggestions found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                </div>
                 <button
                   type="button"
                   className="btn btn-danger ms-2"
@@ -498,16 +749,47 @@ function AddRoom() {
           {baths.map((bath, index) => (
             <div className="row text-start mt-3 d-flex" key={index}>
               <div className="col-12 d-flex">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Enter Details Of The Bathroom Features"
-                  value={bath}
-                  onChange={(e) =>
-                    handleFieldChange(setBaths, baths, index, e.target.value)
-                  }
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                />
+                <div className="w-100">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Details Of The Bathroom Features"
+                    value={bath}
+                    onFocus={() => handleInputFocus("baths", index)}
+                    onChange={(e) =>
+                      handleFieldChange(setBaths, baths, index, e.target.value)
+                    }
+                    style={{ color: "#05062d", fontWeight: "600" }}
+                    required
+                  />
+                  {activeField.type === "baths" &&
+                    activeField.index === index && (
+                      <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                        {suggestions.length > 0 ? (
+                          suggestions.map((suggestion, i) => (
+                            <div
+                              key={i}
+                              className="suggestion-item px-2"
+                              onClick={() =>
+                                handleSuggestionClick(
+                                  setBaths,
+                                  baths,
+                                  index,
+                                  suggestion
+                                )
+                              }
+                            >
+                              {suggestion}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="suggestion-item px-2">
+                            No suggestions found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                </div>
                 <button
                   type="button"
                   className="btn btn-danger ms-2"
@@ -536,6 +818,7 @@ function AddRoom() {
             id="inputGroupFile02"
             multiple
             onChange={handleImageChange}
+            required
           />
           <div className="mt-5">
             <h6 style={{ color: "#05062d" }} className="fw-bold text-start">

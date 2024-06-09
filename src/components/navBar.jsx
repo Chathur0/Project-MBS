@@ -2,8 +2,52 @@ import { Link } from "react-router-dom";
 import logo from "/nav&footer/MBS LOGO_No Letters_1920x1080.png";
 import profile from "/nav&footer/profile.png";
 import {} from "bootstrap/dist/css/bootstrap.min.css";
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 function Nav() {
+  const [auth, setAuth] = useState(false);
+  const [user, setUser] = useState({ userId: "", name: "" });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios
+        .get("http://localhost:3000/checkToken", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          if (res.data.valid) {
+            setAuth(true);
+            setUser({ userId: res.data.userId, name: res.data.name });
+          } else {
+            setAuth(false);
+          }
+        })
+        .catch((err) => {
+          setAuth(false);
+        });
+    } else {
+      setAuth(false);
+    }
+  }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:3000/checkAdmin", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        if (res.data.Status === "Success" && res.data.isAdmin === "Admin") {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+          
+        }
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <div>
       <style>
@@ -61,53 +105,86 @@ function Nav() {
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link
-                  to="/"
-                  className="nav-link fw-bold navLink navLinkEffect"
+                  to="/all-admins"
+                  className={`nav-link fw-bold navLink navLinkEffect d-${isAdmin ? 'block' : 'none'}`}
                 >
+                  Admin
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/" className="nav-link fw-bold navLink navLinkEffect">
                   Home
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link fw-bold navLink navLinkEffect" to="/about_us">
+                <Link
+                  className="nav-link fw-bold navLink navLinkEffect"
+                  to="/about_us"
+                >
                   About
                 </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link fw-bold navLink navLinkEffect" href="#">
+                <Link
+                  to="/program"
+                  className="nav-link fw-bold navLink navLinkEffect"
+                  href="#"
+                >
                   Program
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link fw-bold navLink navLinkEffect" to="/accommodation">
+                <Link
+                  className="nav-link fw-bold navLink navLinkEffect"
+                  to="/accommodation"
+                >
                   Accommodation
                 </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link fw-bold navLink navLinkEffect" href="#">
+                <Link
+                  to="/volunteer-page"
+                  className="nav-link fw-bold navLink navLinkEffect"
+                  href="#"
+                >
                   Volunteer
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link fw-bold navLink navLinkEffect" href="#">
+                <Link
+                  to="/product-home"
+                  className="nav-link fw-bold navLink navLinkEffect"
+                  href="#"
+                >
                   Product
-                </a>
+                </Link>
               </li>
             </ul>
             <div className="mx-0 mx-lg-5 d-flex align-items-center">
-              <div className="d-flex gap-2 justify-content-lg-center align-items-center position-absolute visible">
-                <a href="" className="navLink nav-link fw-bold">
+              <div
+                className={`d-flex gap-2 justify-content-lg-center align-items-center position-absolute ${
+                  auth ? "invisible" : "visible"
+                }`}
+              >
+                <Link to="/login" className="navLink nav-link fw-bold">
                   Login
-                </a>
+                </Link>
                 <div className="navLink fw-bold">/</div>
-                <a href="" className="navLink nav-link fw-bold">
+                <Link to="/Register" className="navLink nav-link fw-bold">
                   Register
-                </a>
+                </Link>
               </div>
-              <div className="d-flex gap-2 justify-content-lg-center align-items-center invisible">
-                <a href="">
+              <div
+                className={`d-flex gap-2 justify-content-lg-center align-items-center ${
+                  auth ? "visible" : "invisible"
+                }`}
+              >
+                <Link to="/Profile">
                   <img src={profile} alt="" width="50" />
-                </a>
-                <div className="fw-bold">Chathuranga</div>
+                </Link>
+                <div className="fw-bold">{`${
+                  auth ? user.name : "Chathuranga"
+                }`}</div>
               </div>
             </div>
           </div>

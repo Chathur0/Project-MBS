@@ -1,30 +1,126 @@
-import React, { useState, useEffect } from "react";
-import Ai1 from "/accommodation-images/si.jpg";
-import Ai2 from "/accommodation-images/do.jpg";
-import Ai3 from "/accommodation-images/tr.jpg";
-import Ai4 from "/accommodation-images/fa.jpg";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
+import { useParams } from "react-router-dom";
+import warning from "/icons/warning.png";
 
-const exampleRoom = {
-  roomNumber: "101",
-  roomType: "single room",
-  area: "35 sqm",
-  capacityAdult: "2",
-  capacityChild: "1",
-  pricePerDay: "100",
-  description: "A cozy single room with a great view.",
-  view: "Sea view",
-  headlines: ["Spacious", "Sea view", "Free Wi-Fi"],
-  technologies: ["Smart TV", "High-speed Internet"],
-  services: ["Room service", "Daily housekeeping"],
-  beds: ["Queen size bed"],
-  baths: ["Walk-in shower"],
-  mainImage: Ai1,
-  images: [Ai1, Ai2, Ai3, Ai4],
-};
+const predefinedHeadlines = [
+  "Tea & Coffee maker",
+  "Complimentary mineral water",
+  "Spacious, brightly lit closets",
+  "In-room digital safe",
+  "Hair dryer",
+  "Electric shaver outlet",
+  "Digital weighing scale",
+  "Writing desk & chair",
+  "Daily housekeeping",
+  "Ironing board & iron",
+  "Shoe shine kit",
+  "Washing machine",
+  "High-speed Wi-Fi",
+  "LED TV with cable channels",
+  "Air conditioning",
+  "Mini refrigerator",
+  "Work desk with lamp",
+  "Comfortable seating area",
+  "En-suite bathroom with hot/cold water",
+  "Premium bedding and pillows",
+  "Blackout curtains for privacy",
+  "Electronic door locks for security",
+  "In-room dining service",
+  "24-hour room service",
+  "Laundry and dry cleaning service",
+  "Complimentary toiletries",
+  "Bathrobes and slippers",
+  "Personalized wake-up call service",
+  "Laptop-sized safe",
+  "Soundproofing for peaceful sleep",
+  "Panoramic city or sea view",
+];
 
-function EditRoom({ room = exampleRoom }) {
+const predefinedTechnologies = [
+  "High-speed Wi-Fi",
+  "LED TV with cable channels",
+  "Air conditioning",
+  "Mini refrigerator",
+  "Work desk with lamp",
+  "Comfortable seating area",
+  "En-suite bathroom with hot/cold water",
+  "Premium bedding and pillows",
+  "Blackout curtains for privacy",
+  "Electronic door locks for security",
+  "In-room dining service",
+  "24-hour room service",
+  "Laundry and dry cleaning service",
+  "Complimentary toiletries",
+  "Bathrobes and slippers",
+  "Personalized wake-up call service",
+  "Laptop-sized safe",
+  "Soundproofing for peaceful sleep",
+];
+
+const predefinedServices = [
+  "Room service",
+  "Daily housekeeping",
+  "Laundry service",
+  "Dry cleaning service",
+  "Concierge service",
+  "Luggage storage",
+  "Airport shuttle service",
+  "24-hour front desk",
+  "Currency exchange",
+  "Childcare service",
+  "Pet-friendly service",
+  "Wake-up call service",
+  "Car rental service",
+  "Tours and ticket assistance",
+  "Business center services",
+];
+
+const predefinedBathDetails = [
+  "Bathtub",
+  "Shower",
+  "Jacuzzi",
+  "Hair dryer",
+  "Complimentary toiletries",
+  "Bathrobes and slippers",
+  "Towels",
+  "Hot and cold water",
+];
+
+const predefinedBedDetails = [
+  "King size bed",
+  "Queen size bed",
+  "Double bed",
+  "Single bed",
+  "Twin bed",
+  "Bunk bed",
+  "Sofa bed",
+  "Premium bedding",
+  "Hypoallergenic pillows",
+];
+
+function EditRoom() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:3000/checkAdmin", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        if (res.data.Status === "Success" && res.data.isAdmin === "Admin") {
+        } else {
+          alert("You do not have permission to access this page");
+          navigate("/");
+        }
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const { id } = useParams();
   const [roomDetails, setRoomDetails] = useState({
     roomNumber: "",
     roomType: "",
@@ -35,88 +131,187 @@ function EditRoom({ room = exampleRoom }) {
     description: "",
     view: "",
   });
-  const [headlines, setHeadlines] = useState([]);
-  const [technologies, setTechnologies] = useState([]);
-  const [services, setServices] = useState([]);
-  const [beds, setBeds] = useState([]);
-  const [baths, setBaths] = useState([]);
-  const [mainImage, setMainImage] = useState(null);
+  const [headlines, setHeadlines] = useState([""]);
+  const [technologies, setTechnologies] = useState([""]);
+  const [services, setServices] = useState([""]);
+  const [beds, setBeds] = useState([""]);
+  const [baths, setBaths] = useState([""]);
   const [images, setImages] = useState([]);
+  const [mainImage, setMainImage] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeField, setActiveField] = useState({ type: null, index: null });
 
   useEffect(() => {
-    if (room) {
-      setRoomDetails({
-        roomNumber: room.roomNumber || "",
-        roomType: room.roomType || "",
-        area: room.area || "",
-        capacityAdult: room.capacityAdult || "",
-        capacityChild: room.capacityChild || "",
-        pricePerDay: room.pricePerDay || "",
-        description: room.description || "",
-        view: room.view,
+    axios
+      .get(`http://localhost:3000/accommodation/getRoom/${id}`)
+      .then((response) => {
+        if (response.data.Status === "Success") {
+          const data = response.data.data;
+          setRoomDetails({
+            roomNumber: data.r_name,
+            roomType: data.type,
+            area: data.area,
+            capacityAdult: JSON.parse(data.capacity).Adult,
+            capacityChild: JSON.parse(data.capacity).Child,
+            pricePerDay: data.price,
+            description: data.r_discription,
+            view: data.view,
+          });
+
+          setHeadlines(JSON.parse(JSON.parse(data.r_highlight)));
+          setTechnologies(JSON.parse(JSON.parse(data.technology)));
+          setServices(JSON.parse(JSON.parse(data.services)));
+          setBeds(JSON.parse(JSON.parse(data.bed_details)));
+          setBaths(JSON.parse(JSON.parse(data.bath_details)));
+
+          const imagePaths = JSON.parse(data.image).map(
+            (img) => `/A_images/${img}`
+          );
+          setImages(imagePaths);
+          setMainImage(imagePaths[0]);
+        } else {
+          console.error("Failed to fetch room details:", response.data.Message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching room details:", error);
       });
-      setHeadlines(room.headlines || []);
-      setTechnologies(room.technologies || []);
-      setServices(room.services || []);
-      setBeds(room.beds || []);
-      setBaths(room.baths || []);
-      setMainImage(room.mainImage || null);
-      setImages(room.images || []);
+  }, [id]);
+  const confirmDelete = () => {
+    const deleteModal = document.getElementById("deleteModal");
+    deleteModal.style.display = "block";
+  };
+
+  const closeModal = () => {
+    const deleteModal = document.getElementById("deleteModal");
+    deleteModal.style.display = "none";
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+  
+    formData.append("roomNumber", roomDetails.roomNumber);
+    formData.append("roomType", roomDetails.roomType);
+    formData.append("area", roomDetails.area);
+    formData.append("capacityAdult", roomDetails.capacityAdult);
+    formData.append("capacityChild", roomDetails.capacityChild);
+    formData.append("pricePerDay", roomDetails.pricePerDay);
+    formData.append("description", roomDetails.description);
+    formData.append("view", roomDetails.view);
+    formData.append("headlines", JSON.stringify(headlines));
+    formData.append("technologies", JSON.stringify(technologies));
+    formData.append("services", JSON.stringify(services));
+    formData.append("beds", JSON.stringify(beds));
+    formData.append("baths", JSON.stringify(baths));
+  
+    try {
+      const response = await axios.put(`http://localhost:3000/accommodation/updateRoom/${id}`, formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (response.data.Status === "Success") {
+        alert("Room updated successfully");
+        navigate('/accommodation-admin/all-rooms')
+      } else {
+        console.error("Failed to update room:", response.data.Message);
+      }
+    } catch (error) {
+      console.error("Error updating room:", error);
     }
-  }, [room]);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setRoomDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
+    setRoomDetails({ ...roomDetails, [name]: value });
   };
 
-  const handleAddField = (setter, array) => {
-    setter([...array, ""]);
+  const handleAddField = (setter, fields) => {
+    setter([...fields, ""]);
   };
 
-  const handleRemoveField = (setter, array, index) => {
-    const newArray = array.filter((_, i) => i !== index);
-    setter(newArray);
+  const handleRemoveField = (setter, fields, index) => {
+    const newFields = fields.filter((_, i) => i !== index);
+    setter(newFields);
   };
 
-  const handleFieldChange = (setter, array, index, value) => {
-    const newArray = array.map((item, i) => (i === index ? value : item));
-    setter(newArray);
+  const handleFieldChange = (setter, fields, index, value) => {
+    const newFields = [...fields];
+    newFields[index] = value;
+    setter(newFields);
   };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    setImages(files);
-    if (!mainImage && files.length > 0) {
-      setMainImage(files[0]);
+  const handleImageChange = (event) => {
+    const files = Array.from(event.target.files);
+    const fileUrls = files.map((file) => URL.createObjectURL(file));
+
+    setImages((prevImages) => [...prevImages, ...fileUrls]);
+    if (!mainImage) {
+      setMainImage(fileUrls[0]);
     }
   };
 
   const handleRemoveImage = (index) => {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
-    if (index === 0 && images.length > 0) {
+    if (mainImage === images[index]) {
       setMainImage(newImages[0] || null);
     }
   };
+  const handleSuggestionClick = (setter, fields, index, value) => {
+    handleFieldChange(setter, fields, index, value);
+    setActiveField({ type: null, index: null });
+  };
+  const handleInputFocus = (type, index) => {
+    setActiveField({ type, index });
+  };
+  useEffect(() => {
+    if (activeField.type !== null) {
+      const fields =
+        activeField.type === "headlines"
+          ? headlines
+          : activeField.type === "technologies"
+          ? technologies
+          : activeField.type === "services"
+          ? services
+          : activeField.type === "beds"
+          ? beds
+          : baths;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log({
-      ...roomDetails,
-      headlines,
-      technologies,
-      services,
-      beds,
-      baths,
-      mainImage,
-      images,
-    });
+      const predefined =
+        activeField.type === "headlines"
+          ? predefinedHeadlines
+          : activeField.type === "technologies"
+          ? predefinedTechnologies
+          : activeField.type === "services"
+          ? predefinedServices
+          : activeField.type === "beds"
+          ? predefinedBedDetails
+          : predefinedBathDetails;
+
+      const currentInput = fields[activeField.index].toLowerCase();
+      const filteredSuggestions = predefined.filter((item) =>
+        item.toLowerCase().includes(currentInput)
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  }, [activeField, headlines, technologies, services, beds, baths]);
+
+  const handleOutsideClick = (e) => {
+    if (!e.target.closest(".suggestions-container")) {
+      setActiveField({ type: null, index: null });
+    }
   };
 
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
   return (
     <div>
       <style>{`
@@ -130,13 +325,18 @@ function EditRoom({ room = exampleRoom }) {
         color: #3f7b48;
         background-color: white;
         border: 2px solid #3f7b48;
-    } `}</style>
+    }
+    .suggestion-item:hover{
+      cursor: pointer;
+      background-color: rgb(235, 235, 235);
+  }    
+    `}</style>
       <Nav />
-      <div className="container">
-        <h3 className="my-5 fw-bolder text-center" style={{ color: "#05062d" }}>
+      <div className="container text-center">
+        <h2 style={{ color: "#05062d" }} className="mb-5">
           Edit Room
-        </h3>
-        <form onSubmit={handleSubmit}>
+        </h2>
+        <form className="text-start">
           <div className="container bg-light border rounded p-5 text-center">
             <h5 style={{ color: "#05062d" }} className="fw-bold">
               Main Details
@@ -157,6 +357,7 @@ function EditRoom({ room = exampleRoom }) {
                   value={roomDetails.roomNumber}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 />
               </div>
             </div>
@@ -173,14 +374,15 @@ function EditRoom({ room = exampleRoom }) {
                   value={roomDetails.roomType}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 >
                   <option value="" disabled hidden>
                     Choose room type
                   </option>
-                  <option value="single room">Single Room</option>
-                  <option value="double room">Double Room</option>
-                  <option value="triple room">Triple Room</option>
-                  <option value="family room">Family Room</option>
+                  <option value="Single Room">Single Room</option>
+                  <option value="Double Room">Double Room</option>
+                  <option value="Triple Room">Triple Room</option>
+                  <option value="Family Room">Family Room</option>
                 </select>
               </div>
             </div>
@@ -199,6 +401,7 @@ function EditRoom({ room = exampleRoom }) {
                   value={roomDetails.area}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 />
               </div>
             </div>
@@ -215,6 +418,7 @@ function EditRoom({ room = exampleRoom }) {
                   value={roomDetails.capacityAdult}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 >
                   <option value="" disabled hidden>
                     Adult
@@ -230,6 +434,7 @@ function EditRoom({ room = exampleRoom }) {
                   value={roomDetails.capacityChild}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 >
                   <option value="" disabled hidden>
                     Child
@@ -257,6 +462,7 @@ function EditRoom({ room = exampleRoom }) {
                   value={roomDetails.pricePerDay}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 />
               </div>
             </div>
@@ -273,53 +479,87 @@ function EditRoom({ room = exampleRoom }) {
                   name="description"
                   value={roomDetails.description}
                   onChange={handleInputChange}
-                  rows="5"
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                ></textarea>
+                  style={{
+                    color: "#05062d",
+                    fontWeight: "600",
+                    height: "100px",
+                  }}
+                  required
+                />
               </div>
             </div>
-
             <div className="row text-start mt-3 d-flex">
               <div className="col-12 col-md-2">
-                <label className="fw-bold" style={{ color: "#05062d" }}>
-                  View:
+                <label style={{ color: "#05062d" }} className="fw-bold">
+                  View :
                 </label>
               </div>
               <div className="col-12 col-md-10">
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter The View From Room"
+                  placeholder="Enter Any Special Views Surrounding The Room"
                   name="view"
                   value={roomDetails.view}
                   onChange={handleInputChange}
                   style={{ color: "#05062d", fontWeight: "600" }}
+                  required
                 />
               </div>
             </div>
           </div>
           <div className="container bg-light border rounded p-5 text-center mt-5">
-            <h5 className="fw-bold mb-5" style={{ color: "#05062d" }}>
-              Headlines
+            <h5 style={{ color: "#05062d" }} className="fw-bold mb-5">
+              Room Highlights
             </h5>
             {headlines.map((headline, index) => (
               <div className="row text-start mt-3 d-flex" key={index}>
                 <div className="col-12 d-flex">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Details Highlighting The Key Features Of The Room"
-                    value={headline}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        setHeadlines,
-                        headlines,
-                        index,
-                        e.target.value
-                      )
-                    }
-                    style={{ color: "#05062d", fontWeight: "600" }}
-                  />
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Details Highlighting The Key Features Of The Room"
+                      value={headline}
+                      onFocus={() => handleInputFocus("headlines", index)}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          setHeadlines,
+                          headlines,
+                          index,
+                          e.target.value
+                        )
+                      }
+                      style={{ color: "#05062d", fontWeight: "600" }}
+                    />
+                    {activeField.type === "headlines" &&
+                      activeField.index === index && (
+                        <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                          {suggestions.length > 0 ? (
+                            suggestions.map((suggestion, i) => (
+                              <div
+                                key={i}
+                                className="suggestion-item px-2"
+                                onClick={() =>
+                                  handleSuggestionClick(
+                                    setHeadlines,
+                                    headlines,
+                                    index,
+                                    suggestion
+                                  )
+                                }
+                              >
+                                {suggestion}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="suggestion-item px-2">
+                              No suggestions found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
                   <button
                     type="button"
                     className="btn btn-danger ms-2"
@@ -341,27 +581,57 @@ function EditRoom({ room = exampleRoom }) {
             </button>
           </div>
           <div className="container bg-light border rounded p-5 text-center mt-5">
-            <h5 className="fw-bold mb-5" style={{ color: "#05062d" }}>
+            <h5 style={{ color: "#05062d" }} className="fw-bold mb-5">
               Technology
             </h5>
             {technologies.map((technology, index) => (
               <div className="row text-start mt-3 d-flex" key={index}>
                 <div className="col-12 d-flex">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Details Technology Features Of The Room"
-                    value={technology}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        setTechnologies,
-                        technologies,
-                        index,
-                        e.target.value
-                      )
-                    }
-                    style={{ color: "#05062d", fontWeight: "600" }}
-                  />
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Details Technology Features Of The Room"
+                      value={technology}
+                      onFocus={() => handleInputFocus("technologies", index)}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          setTechnologies,
+                          technologies,
+                          index,
+                          e.target.value
+                        )
+                      }
+                      style={{ color: "#05062d", fontWeight: "600" }}
+                    />
+                    {activeField.type === "technologies" &&
+                      activeField.index === index && (
+                        <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                          {suggestions.length > 0 ? (
+                            suggestions.map((suggestion, i) => (
+                              <div
+                                key={i}
+                                className="suggestion-item px-2"
+                                onClick={() =>
+                                  handleSuggestionClick(
+                                    setTechnologies,
+                                    technologies,
+                                    index,
+                                    suggestion
+                                  )
+                                }
+                              >
+                                {suggestion}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="suggestion-item px-2">
+                              No suggestions found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
                   <button
                     type="button"
                     className="btn btn-danger ms-2"
@@ -383,27 +653,57 @@ function EditRoom({ room = exampleRoom }) {
             </button>
           </div>
           <div className="container bg-light border rounded p-5 text-center mt-5">
-            <h5 className="fw-bold mb-5" style={{ color: "#05062d" }}>
+            <h5 style={{ color: "#05062d" }} className="fw-bold mb-5">
               Services
             </h5>
             {services.map((service, index) => (
               <div className="row text-start mt-3 d-flex" key={index}>
                 <div className="col-12 d-flex">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Services That Will Be Provided"
-                    value={service}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        setServices,
-                        services,
-                        index,
-                        e.target.value
-                      )
-                    }
-                    style={{ color: "#05062d", fontWeight: "600" }}
-                  />
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Services That Will Be Provided"
+                      value={service}
+                      onFocus={() => handleInputFocus("services", index)}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          setServices,
+                          services,
+                          index,
+                          e.target.value
+                        )
+                      }
+                      style={{ color: "#05062d", fontWeight: "600" }}
+                    />
+                    {activeField.type === "services" &&
+                      activeField.index === index && (
+                        <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                          {suggestions.length > 0 ? (
+                            suggestions.map((suggestion, i) => (
+                              <div
+                                key={i}
+                                className="suggestion-item px-2"
+                                onClick={() =>
+                                  handleSuggestionClick(
+                                    setServices,
+                                    services,
+                                    index,
+                                    suggestion
+                                  )
+                                }
+                              >
+                                {suggestion}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="suggestion-item px-2">
+                              No suggestions found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
                   <button
                     type="button"
                     className="btn btn-danger ms-2"
@@ -425,22 +725,52 @@ function EditRoom({ room = exampleRoom }) {
             </button>
           </div>
           <div className="container bg-light border rounded p-5 text-center mt-5">
-            <h5 className="fw-bold mb-5" style={{ color: "#05062d" }}>
-              Beds
+            <h5 style={{ color: "#05062d" }} className="fw-bold mb-5">
+              Bed Features
             </h5>
             {beds.map((bed, index) => (
               <div className="row text-start mt-3 d-flex" key={index}>
                 <div className="col-12 d-flex">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Details Of The Beds"
-                    value={bed}
-                    onChange={(e) =>
-                      handleFieldChange(setBeds, beds, index, e.target.value)
-                    }
-                    style={{ color: "#05062d", fontWeight: "600" }}
-                  />
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Details Of The Bed Features"
+                      value={bed}
+                      onFocus={() => handleInputFocus("beds", index)}
+                      onChange={(e) =>
+                        handleFieldChange(setBeds, beds, index, e.target.value)
+                      }
+                      style={{ color: "#05062d", fontWeight: "600" }}
+                    />
+                    {activeField.type === "beds" &&
+                      activeField.index === index && (
+                        <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                          {suggestions.length > 0 ? (
+                            suggestions.map((suggestion, i) => (
+                              <div
+                                key={i}
+                                className="suggestion-item px-2"
+                                onClick={() =>
+                                  handleSuggestionClick(
+                                    setBeds,
+                                    beds,
+                                    index,
+                                    suggestion
+                                  )
+                                }
+                              >
+                                {suggestion}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="suggestion-item px-2">
+                              No suggestions found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
                   <button
                     type="button"
                     className="btn btn-danger ms-2"
@@ -456,26 +786,61 @@ function EditRoom({ room = exampleRoom }) {
               className="btn btn-custom mt-3"
               onClick={() => handleAddField(setBeds, beds)}
             >
-              + Add Bed
+              + Add Bed Feature
             </button>
           </div>
           <div className="container bg-light border rounded p-5 text-center mt-5">
-            <h5 className="fw-bold mb-5" style={{ color: "#05062d" }}>
-              Baths
+            <h5 style={{ color: "#05062d" }} className="fw-bold mb-5">
+              Bath Features
             </h5>
             {baths.map((bath, index) => (
               <div className="row text-start mt-3 d-flex" key={index}>
                 <div className="col-12 d-flex">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Details Of The Baths"
-                    value={bath}
-                    onChange={(e) =>
-                      handleFieldChange(setBaths, baths, index, e.target.value)
-                    }
-                    style={{ color: "#05062d", fontWeight: "600" }}
-                  />
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Details Of The Bathroom Features"
+                      value={bath}
+                      onFocus={() => handleInputFocus("baths", index)}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          setBaths,
+                          baths,
+                          index,
+                          e.target.value
+                        )
+                      }
+                      style={{ color: "#05062d", fontWeight: "600" }}
+                    />
+                    {activeField.type === "baths" &&
+                      activeField.index === index && (
+                        <div className="suggestions-container position-absolute border rounded-1 bg-light">
+                          {suggestions.length > 0 ? (
+                            suggestions.map((suggestion, i) => (
+                              <div
+                                key={i}
+                                className="suggestion-item px-2"
+                                onClick={() =>
+                                  handleSuggestionClick(
+                                    setBaths,
+                                    baths,
+                                    index,
+                                    suggestion
+                                  )
+                                }
+                              >
+                                {suggestion}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="suggestion-item px-2">
+                              No suggestions found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
                   <button
                     type="button"
                     className="btn btn-danger ms-2"
@@ -491,65 +856,131 @@ function EditRoom({ room = exampleRoom }) {
               className="btn btn-custom mt-3"
               onClick={() => handleAddField(setBaths, baths)}
             >
-              + Add Bath
+              + Add Bath Feature
             </button>
           </div>
           <div className="container bg-light border rounded p-5 text-center mt-5">
-            <h5 className="fw-bold mb-5" style={{ color: "#05062d" }}>
+            <h5 style={{ color: "#05062d" }} className="fw-bold">
               Images
             </h5>
-            <div className="row text-start mt-3 d-flex">
-              <div className="col-12">
-                <input
-                  type="file"
-                  className="form-control"
-                  multiple
-                  onChange={handleImageChange}
-                  style={{ color: "#05062d", fontWeight: "600" }}
-                />
+            <input
+              type="file"
+              className="form-control mt-5"
+              id="inputGroupFile02"
+              multiple
+              onChange={handleImageChange}
+            />
+            <div className="mt-5">
+              <h6 style={{ color: "#05062d" }} className="fw-bold text-start">
+                Main image:
+              </h6>
+              {mainImage && (
+                <div className="row">
+                  <div className="d-flex align-items-center mt-2 col-12 col-sm-6 col-md-4 col-lg-3">
+                    <img
+                      src={
+                        mainImage.startsWith("/A_images/")
+                          ? `http://localhost:3000${mainImage}`
+                          : mainImage
+                      }
+                      alt="Main"
+                      className="w-100"
+                      style={{ height: "200px", objectFit: "cover" }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="mt-5">
+              <h6 style={{ color: "#05062d" }} className="fw-bold text-start">
+                Other images:
+              </h6>
+              <div className="row w-100">
+                {images.map((image, index) => (
+                  <div
+                    key={index}
+                    className=" col-12 col-sm-6 col-md-4 col-lg-3 position-relative mb-3"
+                  >
+                    <img
+                      src={
+                        image.startsWith("/A_images/")
+                          ? `http://localhost:3000${image}`
+                          : image
+                      }
+                      alt={`Room ${index + 1}`}
+                      className="w-100"
+                      style={{
+                        height: "200px",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="position-absolute border-0 text-white fw-bold"
+                      style={{
+                        padding: "2px 7px",
+                        top: "0",
+                        right: "12px",
+                        backgroundColor: "red",
+                      }}
+                      onClick={() => handleRemoveImage(index)}
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
-
-            <div className="row w-100 mt-5">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className=" col-12 col-sm-6 col-md-4 col-lg-3 position-relative mb-3"
-                >
-                  <img
-                    src={
-                      typeof image === "string"
-                        ? image
-                        : URL.createObjectURL(image)
-                    }
-                    alt={`Room Image ${index + 1}`}
-                    className="w-100"
-                    style={{
-                      height: "200px",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="position-absolute border-0 text-white fw-bold"
-                    style={{
-                      padding: "2px 7px",
-                      top: "0",
-                      right: "12px",
-                      backgroundColor: "red",
-                    }}
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
-            </div>
           </div>
-          <button className="btn btn-custom w-100 my-5" type="submit">
+        </form>
+        <button className="btn btn-custom w-100 my-5" onClick={confirmDelete}>
             Update Room
           </button>
-        </form>
+      </div>
+      <div
+        className="modal"
+        id="deleteModal"
+        tabIndex="-1"
+        role="dialog"
+        style={{ display: "none" }}
+      >
+        <div className="modal-dialog" role="document">
+          <div className="modal-content row">
+            <div className="col-12 mt-3 d-flex justify-content-between">
+              <h5 className="modal-title" id="deleteModalLabel">
+                Confirm Update
+              </h5>
+              <button
+                type="button"
+                className="close btn btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={closeModal}
+              ></button>
+            </div>
+            <div className="modal-body text-center">
+              <img src={warning} alt="" width={100} height={100}/>
+              <p className="fw-bold text-danger mt-1">Are you sure you want to Update this room?</p>
+            </div>
+            <div className="container d-flex justify-content-between mb-2">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleSubmit}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <Footer />
     </div>

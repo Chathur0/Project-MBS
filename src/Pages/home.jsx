@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Nav from "../components/navBar";
 import Carousel from "../components/Carousel";
 import Footer from "../components/footer";
@@ -26,6 +27,7 @@ import Vi1 from "/volunteer-images/v1.jpg";
 import Vi2 from "/volunteer-images/v2.jpg";
 import Vi3 from "/volunteer-images/v3.jpg";
 import { Link } from "react-router-dom";
+import axios from "axios";
 const carouselDetails = [
   {
     image: p1,
@@ -110,13 +112,29 @@ let descriptionV =
   "We're hosting the IUHS campus here, where 200 students study completely free of charge, including complimentary meals. Additionally, we provide accommodation and meals for 50 monks and female monks living on-site. As a volunteer, you can contribute to teaching or participate in various programs without worrying about expenses; food, accommodation. and yoga also free of charge.";
 
 export default function Home() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:3000/checkAdmin", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        if (res.data.Status === "Success" && res.data.isAdmin === "Admin") {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <div>
-      <Nav />
+      <Nav/>
       <Carousel details={carouselDetails} />
       <div className="container mt-4 mb-4 ">
-        <Link to="/accommodation-admin/booked-room" className="text-decoration-none">
-          <Button content="Admin" displayType="block" />
+        <Link to="/all-admins" className="text-decoration-none">
+          <Button content="Admin" displayType={`${isAdmin ? 'block': 'none'}`}/>
         </Link>
       </div>
       <Viewer

@@ -1,9 +1,27 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Layout({ children }) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:3000/checkAdmin", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        if (res.data.Status === "Success" && res.data.isAdmin === "Admin") {
+        } else {
+          alert("You do not have permission to access this page");
+          navigate("/");
+        }
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <div>
       <style>{`

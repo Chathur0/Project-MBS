@@ -13,7 +13,10 @@ import AddRoom from "./components/AddRoom";
 import RoomRequest from "./components/RoomRequest";
 import AllRooms from "./components/AllRooms";
 import Edit_room from "./Pages/Edit_room";
+import AllAdmins from "./Pages/AllAdmins";
 
+import Login from "./Pages/Login";
+import Profile from "./Pages/Profile"
 const initialRoomData = {
   roomNumber: "101",
   roomType: "double room",
@@ -41,6 +44,7 @@ function App() {
         <Route path="/nearby_places_to_visit" element={<Near_here />}></Route>
         <Route path="/about_us" element={<About_us />}></Route>
         <Route path="/accommodation/:type" element={<Room_list />}></Route>
+        <Route path="/all-admins" element={<AllAdmins/>}></Route>
         <Route
           path="/accommodation/:type/:roomId"
           element={<RoomDetail />}
@@ -79,9 +83,12 @@ function App() {
           }
         />
         <Route
-          path="/accommodation-admin/edit-room"
+          path="/accommodation-admin/edit-room/:id"
           element={<Edit_room mode="edit" initialRoomData={initialRoomData} />}
         ></Route>
+
+<Route path="/login" element={<Login />}></Route>
+        <Route path="/Profile" element={<Profile />}></Route>
       </Routes>
     </Router>
   );

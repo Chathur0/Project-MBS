@@ -49,32 +49,32 @@ export default function RoomViewer(props) {
       `}</style>
       <div className="row bg-light d-flex justify-content-between wholeContainer border">
         <div className="col-12 col-md-6 col-lg-5 pe-0 ps-0">
-          <img src={i1} alt="" className="w-100 img" />
+          <img src={`http://localhost:3000/A_images/${props.image}`} alt="" className="w-100 img" />
         </div>
         <div className="col-12 col-md-6 col-lg-7 d-flex flex-column gap-3">
           <h3 className="mt-2 mb-2 fw-bolder ps-5" style={{ color: "#05062d" }}>
-            Family Room nm 01
+            {props.name}
           </h3>
           <div
             className="d-flex ps-5 align-items-center gap-2"
             style={{ color: "#05062d" }}
           >
             <img src={price} alt="" width={20} height={20} />
-            <div className="fw-semibold">15000 LKR /pre day</div>
+            <div className="fw-semibold">{props.price} LKR /pre day</div>
           </div>
           <div
             className="d-flex ps-5 align-items-center gap-2"
             style={{ color: "#05062d" }}
           >
             <img src={bed} alt="" width={20} height={20} />
-            <div className="fw-semibold">2 Double beds & 1 Singe bed</div>
+            <div className="fw-semibold">{props.bed}</div>
           </div>
           <div
             className="d-flex ps-5 align-items-center gap-2"
             style={{ color: "#05062d" }}
           >
             <img src={user} alt="" width={20} height={20} />
-            <div className="fw-semibold">3 Adult & 2 Child</div>
+            <div className="fw-semibold">{props.capacity}</div>
           </div>
           <div className="d-flex ps-5  w-100 container-fluid">
             <div className="row w-100">
@@ -87,7 +87,7 @@ export default function RoomViewer(props) {
                 <img src={tv} alt="" width={20} height={20} />
               </div>
               <div className="col-12 col-sm-6 col-md-12 col-lg-6 d-flex mb-3 mt-3 mt-lg-4 ">
-                <Link to={`/accommodation/${props.type}/${props.roomId}`}>
+                <Link to={`/accommodation/${props.type}/${props.id}`}>
                   <button
                     type="button"
                     className="btn btn-custom ms-lg-auto ms-md-0 ms-0"
