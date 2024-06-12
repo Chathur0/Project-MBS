@@ -112,6 +112,9 @@ let descriptionV =
   "We're hosting the IUHS campus here, where 200 students study completely free of charge, including complimentary meals. Additionally, we provide accommodation and meals for 50 monks and female monks living on-site. As a volunteer, you can contribute to teaching or participate in various programs without worrying about expenses; food, accommodation. and yoga also free of charge.";
 
 export default function Home() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("token");

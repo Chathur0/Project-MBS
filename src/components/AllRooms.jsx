@@ -6,6 +6,9 @@ import axios from "axios";
 import warning from "/icons/warning.png";
 
 function AllRooms() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [rooms, setRooms] = useState([]);
   const [roomToDelete, setRoomToDelete] = useState(null);
@@ -17,7 +20,7 @@ function AllRooms() {
         if (response.data.Status === "Success") {
           const fetchedRooms = response.data.data.map((room) => ({
             id: room.r_id,
-            image: `/A_images/${room.first_image}`, // Adjust this if necessary
+            image: room.first_image, // Adjust this if necessary
             roomNumber: `${
               room.type.charAt(0).toUpperCase() + room.type.slice(1)
             } nm ${room.r_name}`,
@@ -33,7 +36,6 @@ function AllRooms() {
   }, []);
   const confirmDelete = (roomId) => {
     setRoomToDelete(roomId);
-    // Show the modal
     const deleteModal = document.getElementById("deleteModal");
     deleteModal.style.display = "block";
   };
@@ -46,7 +48,6 @@ function AllRooms() {
         } else {
           console.error("Failed to delete room:", response.data.Message);
         }
-        // Hide the modal
         const deleteModal = document.getElementById("deleteModal");
         deleteModal.style.display = "none";
       })
@@ -83,7 +84,7 @@ function AllRooms() {
               filteredRooms.map((data, index) => (
                 <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-4">
                   <img
-                    src={`http://localhost:3000${data.image}`}
+                    src={`http://localhost:3000/A_images/${data.image}`}
                     alt=""
                     className="w-100"
                     style={{

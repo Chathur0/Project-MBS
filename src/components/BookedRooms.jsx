@@ -1,134 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Dp from "/nav&footer/profile.png";
 import clean from "/icons/clean.png";
-
-const bookedRoomsData = [
-    {
-        profile: Dp,
-        name: "John Doe",
-        roomNumber: 101,
-        contactNumber: "1234567890",
-        email: "johndoe@example.com",
-        checkIn: "2024-05-20",
-        checkOut: "2024-05-25",
-        package: "BB",
-        status: "Guest",
-      },
-      {
-        profile: Dp,
-        name: "Jane Smith",
-        roomNumber: 102,
-        contactNumber: "0987654321",
-        email: "janesmith@example.com",
-        checkIn: "2024-05-21",
-        checkOut: "2024-05-26",
-        package: "FB",
-        status: "Visited",
-      },
-      {
-        profile: Dp,
-        name: "Bob Johnson",
-        roomNumber: 103,
-        contactNumber: "1122334455",
-        email: "bobjohnson@example.com",
-        checkIn: "2024-05-22",
-        checkOut: "2024-05-27",
-        package: "HB",
-        status: "Guest",
-      },
-      {
-        profile: Dp,
-        name: "Alice Brown",
-        roomNumber: 104,
-        contactNumber: "2233445566",
-        email: "alicebrown@example.com",
-        checkIn: "2024-05-23",
-        checkOut: "2024-05-28",
-        package: "BB",
-        status: "Visited",
-      },
-      {
-        profile: Dp,
-        name: "Charlie Davis",
-        roomNumber: 105,
-        contactNumber: "3344556677",
-        email: "charliedavis@example.com",
-        checkIn: "2024-05-24",
-        checkOut: "2024-05-29",
-        package: "FB",
-        status: "Guest",
-      },
-      {
-        profile: Dp,
-        name: "Diana Evans",
-        roomNumber: 106,
-        contactNumber: "4455667788",
-        email: "dianaevans@example.com",
-        checkIn: "2024-05-25",
-        checkOut: "2024-05-30",
-        package: "HB",
-        status: "Guest",
-      },
-      {
-        profile: Dp,
-        name: "Edward Foster",
-        roomNumber: 107,
-        contactNumber: "5566778899",
-        email: "edwardfoster@example.com",
-        checkIn: "2024-05-26",
-        checkOut: "2024-05-31",
-        package: "BB",
-        status: "Guest",
-      },
-      {
-        profile: Dp,
-        name: "Fiona Green",
-        roomNumber: 108,
-        contactNumber: "6677889900",
-        email: "fionagreen@example.com",
-        checkIn: "2024-05-27",
-        checkOut: "2024-06-01",
-        package: "FB",
-        status: "User",
-      },
-      {
-        profile: Dp,
-        name: "George Hill",
-        roomNumber: 109,
-        contactNumber: "7788990011",
-        email: "georgehill@example.com",
-        checkIn: "2024-05-28",
-        checkOut: "2024-06-02",
-        package: "HB",
-        status: "Guest",
-      },
-      {
-        profile: Dp,
-        name: "Hannah White",
-        roomNumber: 110,
-        contactNumber: "8899001122",
-        email: "hannahwhite@example.com",
-        checkIn: "2024-05-29",
-        checkOut: "2024-06-03",
-        package: "BB",
-        status: "User",
-      },
-];
+import axios from "axios";
 
 function BookedRooms() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [bookedRoomsData, setBookedRoomsData] = useState([]);
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/approved")
+      .then((response) => {
+        console.log(response.data);
+        const fetchedData = response.data.map((item) => ({
+          name: item.f_name,
+          roomNumber: `${
+            item.type.charAt(0).toUpperCase() + item.type.slice(1)
+          } nm ${item.r_name}`,
+          contactNumber: item.m_number,
+          checkIn: new Date(item.check_in).toISOString().split("T")[0],
+          checkOut: new Date(item.check_out).toISOString().split("T")[0],
+          package: item.package,
+          email: item.email,
+          status: item.status,
+          id: item.b_id,
+          slip: item.b_slip,
+        }));
+        setBookedRoomsData(fetchedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
+  }, []);
   const filteredRooms = bookedRoomsData.filter(
     (room) =>
       (room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.contactNumber.includes(searchQuery)) &&
+        room.contactNumber.includes(searchQuery)) &&
       (statusFilter === "" || room.status === statusFilter)
   );
-
+  
+  const handleCleanRoom = (id, slip) => {
+    if (window.confirm("Are you sure you want to clean this room?")) {
+      axios
+        .delete(`http://localhost:3000/api/bookings/${id}`)
+        .then((response) => {
+          console.log(response.data);
+          setBookedRoomsData((prevData) =>
+            prevData.filter((room) => room.id !== id)
+          );
+          axios
+            .delete(`http://localhost:3000/api/delete-slip/${slip}`)
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.error("Error deleting slip: ", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Error cleaning room: ", error);
+        });
+    }
+  };
   return (
     <div className="text-center">
-      
       <h2 style={{ color: "#05062d" }}>All Booked Rooms</h2>
       <div className="form-group d-flex gap-3 container my-5">
         <div className="row bg-light p-3 rounded-3 border w-100">
@@ -148,9 +87,9 @@ function BookedRooms() {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="">Filter by Status</option>
-              <option value="Guest">Guest</option>
-              <option value="Visited">Visited</option>
-              <option value="User">User</option>
+              <option value="guest">Guest</option>
+              <option value="visited">Visited</option>
+              <option value="user">User</option>
             </select>
           </div>
         </div>
@@ -159,7 +98,6 @@ function BookedRooms() {
         <table className="mt-3 table table-hover border">
           <thead>
             <tr>
-              <th>Profile</th>
               <th>Name</th>
               <th>Room Number</th>
               <th>Contact Number</th>
@@ -175,9 +113,6 @@ function BookedRooms() {
             {filteredRooms.length > 0 ? (
               filteredRooms.map((room, index) => (
                 <tr key={index}>
-                  <td>
-                    <img src={room.profile} alt="Profile" width="40" />
-                  </td>
                   <td>{room.name}</td>
                   <td>{room.roomNumber}</td>
                   <td>{room.contactNumber}</td>
@@ -187,7 +122,10 @@ function BookedRooms() {
                   <td>{room.package}</td>
                   <td>{room.status}</td>
                   <td>
-                    <button className="btn">
+                    <button
+                      className="btn"
+                      onClick={() => handleCleanRoom(room.id, room.slip)}
+                    >
                       <img src={clean} alt="Clean" width="40" />
                     </button>
                   </td>

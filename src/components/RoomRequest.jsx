@@ -1,122 +1,36 @@
 import React, { useState, useEffect } from "react";
 import Slip from "/Slip-images/slip1.jpg";
-
-const roomRequestsData = [
-  {
-    name: "Jane Doe",
-    roomNumber: "Deluxe",
-    contactNumber: "0987654321",
-    email: "janedoe@example.com",
-    checkIn: "2024-05-22",
-    checkOut: "2024-05-27",
-    package: "BB",
-    totalPayment: "16250 LKR",
-    slip: Slip,
-  },
-  {
-    name: "John Smith",
-    roomNumber: "Standard",
-    contactNumber: "1234567890",
-    email: "johnsmith@example.com",
-    checkIn: "2024-06-01",
-    checkOut: "2024-06-05",
-    package: "HB",
-    totalPayment: "10250 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Alice Johnson",
-    roomNumber: "Suite",
-    contactNumber: "2345678901",
-    email: "alicejohnson@example.com",
-    checkIn: "2024-06-10",
-    checkOut: "2024-06-15",
-    package: "FB",
-    totalPayment: "20500 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Bob Brown",
-    roomNumber: "Deluxe",
-    contactNumber: "3456789012",
-    email: "bobbrown@example.com",
-    checkIn: "2024-06-20",
-    checkOut: "2024-06-25",
-    package: "BB",
-    totalPayment: "16250 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Carol Davis",
-    roomNumber: "Standard",
-    contactNumber: "4567890123",
-    email: "caroldavis@example.com",
-    checkIn: "2024-07-01",
-    checkOut: "2024-07-05",
-    package: "HB",
-    totalPayment: "10250 LKR",
-    slip: Slip,
-  },
-  {
-    name: "David Wilson",
-    roomNumber: "Suite",
-    contactNumber: "5678901234",
-    email: "davidwilson@example.com",
-    checkIn: "2024-07-10",
-    checkOut: "2024-07-15",
-    package: "FB",
-    totalPayment: "20500 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Eve Evans",
-    roomNumber: "Deluxe",
-    contactNumber: "6789012345",
-    email: "eveevans@example.com",
-    checkIn: "2024-07-20",
-    checkOut: "2024-07-25",
-    package: "BB",
-    totalPayment: "16250 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Frank Green",
-    roomNumber: "Standard",
-    contactNumber: "7890123456",
-    email: "frankgreen@example.com",
-    checkIn: "2024-08-01",
-    checkOut: "2024-08-05",
-    package: "HB",
-    totalPayment: "10250 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Grace Hall",
-    roomNumber: "Suite",
-    contactNumber: "8901234567",
-    email: "gracehall@example.com",
-    checkIn: "2024-08-10",
-    checkOut: "2024-08-15",
-    package: "FB",
-    totalPayment: "20500 LKR",
-    slip: Slip,
-  },
-  {
-    name: "Hank Lee",
-    roomNumber: "Deluxe",
-    contactNumber: "9012345678",
-    email: "hanklee@example.com",
-    checkIn: "2024-08-20",
-    checkOut: "2024-08-25",
-    package: "BB",
-    totalPayment: "16250 LKR",
-    slip: Slip,
-  },
-];
+import axios from "axios";
 
 function RoomRequest() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSlip, setSelectedSlip] = useState(null);
+  const [roomRequestsData, setRoomRequestsData] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/pending-approval")
+      .then((response) => {
+        const fetchedData = response.data.map((item) => ({
+          name: item.f_name,
+          roomNumber: `${
+            item.type.charAt(0).toUpperCase() + item.type.slice(1)
+          } nm ${item.r_name}`,
+          contactNumber: item.m_number,
+          bookedDate: new Date(item.b_date).toISOString().split("T")[0],
+          checkIn: new Date(item.check_in).toISOString().split("T")[0],
+          checkOut: new Date(item.check_out).toISOString().split("T")[0],
+          package: item.package,
+          totalPayment: `${item.b_cost} LKR`,
+          slip: `http://localhost:3000/slip/${item.b_slip}`,
+          id: item.b_id,
+        }));
+        setRoomRequestsData(fetchedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
+  }, []);
 
   const filteredRequests = roomRequestsData.filter(
     (request) =>
@@ -164,6 +78,23 @@ function RoomRequest() {
     };
   }, []);
 
+  const handleApprove = (id) => {
+    if (window.confirm("Are you sure you want to approve this booking?")) {
+      axios
+        .post("http://localhost:3000/api/approve-booking", { b_id: id })
+        .then((response) => {
+          console.log(response.data);
+
+          setRoomRequestsData((prevData) =>
+            prevData.filter((request) => request.id !== id)
+          );
+        })
+        .catch((error) => {
+          console.error("Error approving booking: ", error);
+        });
+    }
+  };
+
   return (
     <div className="container text-center">
       <h2 style={{ color: "#05062d" }}>Room Requests</h2>
@@ -187,7 +118,7 @@ function RoomRequest() {
               <th>Name</th>
               <th>Room Number</th>
               <th>Contact Number</th>
-              <th>Email</th>
+              <th>Booked Date</th>
               <th>Check In</th>
               <th>Check Out</th>
               <th>Package</th>
@@ -203,7 +134,7 @@ function RoomRequest() {
                   <td>{request.name}</td>
                   <td>{request.roomNumber}</td>
                   <td>{request.contactNumber}</td>
-                  <td>{request.email}</td>
+                  <td>{request.bookedDate}</td>
                   <td>{request.checkIn}</td>
                   <td>{request.checkOut}</td>
                   <td>{request.package}</td>
@@ -219,7 +150,12 @@ function RoomRequest() {
                     />
                   </td>
                   <td>
-                    <button className="btn btn-success">Approve</button>
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleApprove(request.id)}
+                    >
+                      Approve
+                    </button>
                   </td>
                 </tr>
               ))
@@ -261,7 +197,7 @@ function RoomRequest() {
             <button
               className="btn btn-close"
               onClick={handleCloseSlip}
-              style={{ position: "absolute", top: 10, right: 10 }}
+              style={{ position: "absolute" }}
             ></button>
           </div>
         </div>

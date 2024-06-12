@@ -97,6 +97,7 @@ const predefinedBedDetails = [
   "Hypoallergenic pillows",
 ];
 function AddRoom() {
+
   const [roomDetails, setRoomDetails] = useState({
     roomNumber: "",
     roomType: "",

@@ -103,6 +103,9 @@ const predefinedBedDetails = [
 ];
 
 function EditRoom() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("token");

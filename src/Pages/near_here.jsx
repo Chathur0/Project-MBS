@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import i from "/near_here/star.png";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
@@ -475,6 +475,9 @@ const attractionPlaces = [
   },
 ];
 export default function Near_here() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div>
       <style>
@@ -518,7 +521,7 @@ export default function Near_here() {
                 href={data.search_link}
                 style={{ marginBottom: "15px" }}
               >
-                <div className="wholeContainer bg-danger">
+                <div className="wholeContainer bg-light">
                   <img src={data.place_image} alt="" className="w-100 img" />
                   <div className="ditailsContainor container pb-2 pt-2">
                     <div className="fw-semibold">

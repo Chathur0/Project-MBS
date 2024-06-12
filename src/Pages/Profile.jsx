@@ -44,6 +44,7 @@ function Profile() {
       .then((res) => {
         if (res.data.Status === "Success") {
             localStorage.removeItem("token");
+            localStorage.removeItem("bookingDetails");
           navigate("/");
         } else {
           alert("Error");

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
 import Ai1 from "/accommodation-images/si.jpg";
@@ -9,6 +9,9 @@ import Button from "../components/button";
 import { Link } from "react-router-dom";
 
 export default function accommodation() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div>
       <style>{`.textContainerWithShadow{

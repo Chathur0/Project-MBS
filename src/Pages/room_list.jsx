@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Nav from "../components/navBar";
 import Footer from "../components/footer";
 import { useParams, Link } from "react-router-dom";
@@ -7,7 +7,7 @@ import RoomViewer from "../components/RoomViewer";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import notFound from "/icons/notFound.png";
-
+import { BookingContext } from "../context/BookingContext";
 const roomDescription = {
   single_room: {
     description:
@@ -27,6 +27,9 @@ const roomDescription = {
   },
 };
 export default function room_list() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const convertToTypeCase = (str) => {
     return str
       .split("_")
@@ -38,6 +41,8 @@ export default function room_list() {
   const roomDes = roomDescription[type];
   const [rooms, setRooms] = useState([]);
   const isRoom = rooms.length > 0;
+
+  //.............................................................
   useEffect(() => {
     axios
       .get(
@@ -54,7 +59,23 @@ export default function room_list() {
       .catch((error) => {
         console.error("Error fetching room details:", error);
       });
+
+      axios
+      .get(`http://localhost:3000/api/booked-rooms?type=${convertedType}`)
+      .then((response) => {
+        console.log("Booked Rooms: ", response.data); 
+      })
+      .catch((error) => {
+        console.error("Error fetching booked room details:", error);
+      });
   }, [convertedType]);
+  console.log(rooms);
+  const { startDate, endDate, adults, childrenCount, childAges, totalDays } =
+    useContext(BookingContext);
+
+  const handleCheckAvailability = () => {
+    
+  };
 
   return (
     <div>
@@ -67,11 +88,10 @@ export default function room_list() {
           {roomDes.description}
         </p>
       </div>
-      <CheckAvailability />
+      <CheckAvailability handleCheckAvailability={handleCheckAvailability} />
       {isRoom ? (
         <div className="mb-5">
           {rooms.map((data) => {
-            console.log(data);
             const roomName = data.type
               ? `${data.type.charAt(0).toUpperCase() + data.type.slice(1)} nm ${
                   data.r_name
@@ -79,10 +99,10 @@ export default function room_list() {
               : "";
             const image = data.image ? JSON.parse(data.image) : null;
             const firstImage = image ? image[0] : null;
-            const bedD = JSON.parse(JSON.parse(data.bed_details))
+            const bedD = JSON.parse(JSON.parse(data.bed_details));
             const bedDetails = bedD ? bedD[0] : null;
-            const Capacity = JSON.parse(data.capacity)
-            const capacityDetails = `${Capacity.Adult} Adult & ${Capacity.Child} Child`
+            const Capacity = JSON.parse(data.capacity);
+            const capacityDetails = `${Capacity.Adult} Adult & ${Capacity.Child} Child`;
             return (
               <RoomViewer
                 type={type}
@@ -90,16 +110,20 @@ export default function room_list() {
                 name={roomName}
                 price={data.price}
                 image={firstImage}
-                bed = {bedDetails}
-                capacity = {capacityDetails}
+                bed={bedDetails}
+                capacity={capacityDetails}
               />
             );
           })}
         </div>
       ) : (
         <div className="container text-center my-5">
-          <img src={notFound} alt="" />
-          <h2 style={{ color: "#05062d" }}>Sorry No rooms available!</h2>
+          <div className="row d-flex justify-content-center">
+            <div className="col-10 col-md-4">
+              <img src={notFound} alt="" className="w-100" />
+              <h2 style={{ color: "#05062d" }}>Sorry No rooms available!</h2>
+            </div>
+          </div>
         </div>
       )}
 
