@@ -15,31 +15,33 @@ function BookedRooms() {
     axios
       .get("http://localhost:3000/api/approved")
       .then((response) => {
-        console.log(response.data);
-        const fetchedData = response.data.map((item) => ({
-          name: item.f_name,
-          roomNumber: `${
-            item.type.charAt(0).toUpperCase() + item.type.slice(1)
-          } nm ${item.r_name}`,
-          contactNumber: item.m_number,
-          checkIn: new Date(item.check_in).toISOString().split("T")[0],
-          checkOut: new Date(item.check_out).toISOString().split("T")[0],
-          package: item.package,
-          email: item.email,
-          status: item.status,
-          id: item.b_id,
-          slip: item.b_slip,
-        }));
+        const fetchedData = response.data.map((item) => {
+          const checkIn = new Date(item.check_in);
+          const checkOut = new Date(item.check_out);
+          return {
+            name: item.f_name,
+            roomNumber: `${item.type.charAt(0).toUpperCase() + item.type.slice(1)} nm ${item.r_name}`,
+            contactNumber: item.m_number,
+            checkIn: `${checkIn.getFullYear()}-${(checkIn.getMonth() + 1)}-${checkIn.getDate()}`,
+            checkOut: `${checkOut.getFullYear()}-${(checkOut.getMonth() + 1)}-${checkOut.getDate()}`,
+            package: item.package,
+            email: item.email,
+            status: item.status,
+            id: item.b_id,
+            slip: item.b_slip,
+          };
+        });
         setBookedRoomsData(fetchedData);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
       });
   }, []);
+  
   const filteredRooms = bookedRoomsData.filter(
     (room) =>
       (room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        room.contactNumber.includes(searchQuery)) &&
+        room.roomNumber.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (statusFilter === "" || room.status === statusFilter)
   );
   
@@ -48,7 +50,6 @@ function BookedRooms() {
       axios
         .delete(`http://localhost:3000/api/bookings/${id}`)
         .then((response) => {
-          console.log(response.data);
           setBookedRoomsData((prevData) =>
             prevData.filter((room) => room.id !== id)
           );
@@ -75,7 +76,7 @@ function BookedRooms() {
             <input
               type="text"
               className="form-control w-100"
-              placeholder="Search by User Name or Mobile Number"
+              placeholder="Search by User Name or Room Number"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

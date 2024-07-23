@@ -9,7 +9,7 @@ import area from "/icons/wide.png";
 import BookingForm from "../components/checkAvailability";
 import Carousel from "../components/Carousel";
 import { BookingContext } from "../context/BookingContext";
-
+import Booked from "/icons/booked.mp4";
 import OccupancyAlert from "../components/OccupancyAlert";
 const policy = {
   single_room: {
@@ -52,6 +52,12 @@ export default function RoomDetail() {
   const [images, setImages] = useState([]);
   const [capacityAdult, setCapacityAdult] = useState(0);
   const [capacityChild, setCapacityChild] = useState(0);
+
+  const [bookedDetails, setBookedDetails] = useState([]);
+  const [availabilityMessage, setAvailabilityMessage] = useState([]);
+  const navigate = useNavigate();
+  const { startDate, endDate, adults, childrenCount, childAges, totalDays } =
+    useContext(BookingContext);
   useEffect(() => {
     axios
       .get(`http://localhost:3000/accommodation/getRoom/${roomId}`)
@@ -89,24 +95,49 @@ export default function RoomDetail() {
       .catch((error) => {
         console.error("Error fetching room details:", error);
       });
+
+    axios
+      .get(`http://localhost:3000/api/booked-room-details?roomId=${roomId}`)
+      .then((response) => {
+        setBookedDetails(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching booked room details:", error);
+      });
   }, [roomId]);
-
   const imagesArray = images.map((url) => ({ image: url }));
-
   //...........................................................................
-  const navigate = useNavigate();
-  const { startDate, endDate, adults, childrenCount, childAges, totalDays } =
-    useContext(BookingContext);
-  const handleCheckAvailability = () => {
-    alert(
-      `Check-in: ${startDate.toDateString()}\n` +
-        `Check-out: ${endDate ? endDate.toDateString() : "N/A"}\n` +
-        `Adults: ${adults}\n` +
-        `Children: ${childrenCount}\n` +
-        `Total Days: ${totalDays}\n` +
-        `Child Ages: ${childAges.join(", ")}`
-    );
-  };
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate).getTime();
+      const end = new Date(endDate).getTime();
+      const conflictingBookings = bookedDetails.filter((booking) => {
+        const checkIn = new Date(booking.check_in).getTime();
+        const checkOut = new Date(booking.check_out).getTime();
+        return start < checkOut && end > checkIn;
+      });
+
+      if (conflictingBookings.length > 0) {
+        const message = conflictingBookings.map((booking) => {
+          const checkIn = new Date(booking.check_in).toLocaleDateString();
+          const checkOut = new Date(booking.check_out).toLocaleDateString();
+          return `Booked from ${checkIn} to ${checkOut}`;
+        });
+        setAvailabilityMessage(message);
+      } else {
+        setAvailabilityMessage("");
+      }
+    }
+  }, [
+    startDate,
+    endDate,
+    bookedDetails,
+    adults,
+    capacityAdult,
+    childrenCount,
+    capacityChild,
+  ]);
+
   return (
     <div>
       <style>{`
@@ -155,15 +186,18 @@ export default function RoomDetail() {
           </div>
         </div>
         <div>
-          <div className="mt-5 mb-3">
-            <BookingForm handleCheckAvailability={handleCheckAvailability} />
+          <div className="mt-5 mb-3 text-start">
+            <BookingForm/>
           </div>
           {adults > capacityAdult || childrenCount > capacityChild ? (
-            <OccupancyAlert/>
+            <OccupancyAlert />
           ) : (
             <div>
               <Carousel details={imagesArray} />
-              <div className="border mt-5 rounded-3 bg-light" data-aos="fade-up">
+              <div
+                className="border mt-5 rounded-3 bg-light"
+                data-aos="fade-up"
+              >
                 <h3
                   className="mt-5 mb-4 fw-bolder text-start ps-5"
                   style={{ color: "#05062d" }}
@@ -191,7 +225,10 @@ export default function RoomDetail() {
                   {roomDetails.view}
                 </p>
               </div>
-              <div className="border mt-4 rounded-3 bg-light" data-aos="fade-up">
+              <div
+                className="border mt-4 rounded-3 bg-light"
+                data-aos="fade-up"
+              >
                 <h3
                   className="mt-5 mb-4 fw-bolder text-start ps-5"
                   style={{ color: "#05062d" }}
@@ -210,7 +247,10 @@ export default function RoomDetail() {
                   </div>
                 </div>
               </div>
-              <div className="border mt-4 rounded-3 bg-light" data-aos="fade-up">
+              <div
+                className="border mt-4 rounded-3 bg-light"
+                data-aos="fade-up"
+              >
                 <h3
                   className="mt-5 mb-4 fw-bolder text-start ps-5"
                   style={{ color: "#05062d" }}
@@ -229,7 +269,10 @@ export default function RoomDetail() {
                   </div>
                 </div>
               </div>
-              <div className="border container mt-4 rounded-3 bg-light" data-aos="fade-up">
+              <div
+                className="border container mt-4 rounded-3 bg-light"
+                data-aos="fade-up"
+              >
                 <div className="row mb-5" style={{ color: "#05062d" }}>
                   <div className="col-12 col-md-6 text-start ps-5">
                     <h3
@@ -256,22 +299,42 @@ export default function RoomDetail() {
                 </div>
               </div>
               <div className="" data-aos="fade-up">
-              <h3 className="mt-5 mb-4 fw-bolder " style={{ color: "#05062d" }}>
-                Accommodation Policy
-              </h3>
-              <p className="fw-semibold mb-5" style={{ color: "#05062d" }}>
-                {roomPol.policy}
-              </p>
-
+                <h3
+                  className="mt-5 mb-4 fw-bolder "
+                  style={{ color: "#05062d" }}
+                >
+                  Accommodation Policy
+                </h3>
+                <p className="fw-semibold mb-5" style={{ color: "#05062d" }}>
+                  {roomPol.policy}
+                </p>
               </div>
               <button
                 className="btn btn-custom"
                 onClick={() => navigate(`/booking-process/${type}/${roomId}`)}
+                disabled={availabilityMessage.length > 0}
               >
                 BOOK NOW
               </button>
             </div>
           )}
+          <div>
+            {availabilityMessage.length > 0 && (
+              <div
+                style={{ color: "red" }}
+                className="container my-5 d-flex justify-content-center fw-bolder"
+              >
+                <div className="col-12 col-md-6  rounded  border p-3">
+                <h4 style={{color:"#05062d"}} className="fw-bold">Room Already Booked</h4>
+                <video src={Booked} className="w-75" autoPlay loop/>
+
+                  {availabilityMessage.map((message, index) => (                  
+                      <div key={index} >{message}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <Footer />

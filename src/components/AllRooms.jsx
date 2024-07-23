@@ -41,18 +41,33 @@ function AllRooms() {
   };
   const handleDelete = () => {
     axios
-      .delete(`http://localhost:3000/accommodation/deleteRoom/${roomToDelete}`)
+      .get(`http://localhost:3000/api/all-booked-rooms/${roomToDelete}`)
       .then((response) => {
-        if (response.data.Status === "Success") {
-          setRooms(rooms.filter((room) => room.id !== roomToDelete));
+        if (response.data.length > 0) {
+          const deleteModal = document.getElementById("deleteModal");
+          deleteModal.style.display = "none";
+          alert(
+            "This room cannot be deleted because it is already booked or pending for book please check."
+          );
         } else {
-          console.error("Failed to delete room:", response.data.Message);
+          axios
+            .delete(`http://localhost:3000/accommodation/deleteRoom/${roomToDelete}`)
+            .then((response) => {
+              if (response.data.Status === "Success") {
+                setRooms(rooms.filter((room) => room.id !== roomToDelete));
+              } else {
+                console.error("Failed to delete room:", response.data.Message);
+              }
+              const deleteModal = document.getElementById("deleteModal");
+              deleteModal.style.display = "none";
+            })
+            .catch((error) => {
+              console.error("Error deleting room:", error);
+            });
         }
-        const deleteModal = document.getElementById("deleteModal");
-        deleteModal.style.display = "none";
       })
       .catch((error) => {
-        console.error("Error deleting room:", error);
+        console.error("Error checking booking status:", error);
       });
   };
   const closeModal = () => {
@@ -69,7 +84,7 @@ function AllRooms() {
         All Rooms
       </h2>
       <div className="row">
-        <div className="col-12">
+        <div className="col-12 bg-danger bg-light p-3 rounded-3 border w-100">
           <input
             type="text"
             className="form-control w-100"
@@ -78,6 +93,7 @@ function AllRooms() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+
         <div className="container mt-5">
           <div className="row d-flex justify-content-center">
             {filteredRooms.length > 0 ? (
@@ -157,8 +173,10 @@ function AllRooms() {
               ></button>
             </div>
             <div className="modal-body">
-              <img src={warning} alt="" width={100} height={100}/>
-              <p className="fw-bold text-danger mt-1">Are you sure you want to delete this room?</p>
+              <img src={warning} alt="" width={100} height={100} />
+              <p className="fw-bold text-danger mt-1">
+                Are you sure you want to delete this room?
+              </p>
             </div>
             <div className="container d-flex justify-content-between mb-2">
               <button

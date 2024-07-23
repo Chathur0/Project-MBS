@@ -13,6 +13,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [values, setValues] = useState({
     email: "",
     password: "",

@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { Container, Row, Col, Button, Dropdown, Form } from 'react-bootstrap';
-import { BookingContext } from '../context/BookingContext';
+import React, { useContext, useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Container, Row, Col, Button, Dropdown, Form } from "react-bootstrap";
+import { BookingContext } from "../context/BookingContext";
 
-const BookingForm = ({ handleCheckAvailability }) => {
+const BookingForm = () => {
   const {
     startDate,
     setStartDate,
@@ -12,15 +12,15 @@ const BookingForm = ({ handleCheckAvailability }) => {
     setEndDate,
     adults,
     setAdults,
-    childrenCount, // Updated
-    setChildrenCount, // Updated
+    childrenCount,
+    setChildrenCount,
     childAges,
     setChildAges,
     totalDays,
     setTotalDays,
     handleAdultsChange,
     handleChildrenChange,
-    handleChildAgeChange
+    handleChildAgeChange,
   } = useContext(BookingContext);
 
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -66,8 +66,9 @@ const BookingForm = ({ handleCheckAvailability }) => {
           }
         }
       `}</style>
-      <Row className="align-items-center bg-light p-2 border rounded custom-width">
-        <Col sm={12} lg={6} xl={3}>
+      <Row className="align-items-center p-2 border rounded custom-width" style={{backgroundColor:"#05062d"}}>
+        <Col sm={12} lg={6} xl={4} className="text-white">
+        Check-In
           <DatePicker
             selected={startDate}
             onChange={(date) => setStartDate(date)}
@@ -79,7 +80,8 @@ const BookingForm = ({ handleCheckAvailability }) => {
             className="form-control custom-datepicker mb-2"
           />
         </Col>
-        <Col sm={12} lg={6} xl={3}>
+        <Col sm={12} lg={6} xl={4} className="text-white">
+        Check-Out
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
@@ -91,7 +93,8 @@ const BookingForm = ({ handleCheckAvailability }) => {
             className="form-control custom-datepicker mb-2"
           />
         </Col>
-        <Col sm={12} lg={6} xl={3}>
+        <Col sm={12} lg={6} xl={4} className="text-white">
+          Occupancy
           <Dropdown
             show={dropdownVisible}
             onToggle={() => setDropdownVisible(!dropdownVisible)}
@@ -175,11 +178,6 @@ const BookingForm = ({ handleCheckAvailability }) => {
               )}
             </Dropdown.Menu>
           </Dropdown>
-        </Col>
-        <Col sm={12} lg={6} xl={3}>
-          <Button onClick={handleCheckAvailability} className="w-100">
-            Check Availability
-          </Button>
         </Col>
       </Row>
     </Container>

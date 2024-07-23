@@ -27,9 +27,6 @@ const roomDescription = {
   },
 };
 export default function room_list() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   const convertToTypeCase = (str) => {
     return str
       .split("_")
@@ -40,8 +37,12 @@ export default function room_list() {
   const convertedType = convertToTypeCase(type);
   const roomDes = roomDescription[type];
   const [rooms, setRooms] = useState([]);
+  const [bookedRoom, setBookedRoom] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
   const isRoom = rooms.length > 0;
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   //.............................................................
   useEffect(() => {
     axios
@@ -52,6 +53,7 @@ export default function room_list() {
         if (response.data.Status === "Success") {
           const data = response.data.data;
           setRooms(data);
+          setFilteredRooms(data);
         } else {
           console.error("Failed to fetch room details:", response.data.Message);
         }
@@ -60,23 +62,44 @@ export default function room_list() {
         console.error("Error fetching room details:", error);
       });
 
-      axios
+    axios
       .get(`http://localhost:3000/api/booked-rooms?type=${convertedType}`)
       .then((response) => {
-        console.log("Booked Rooms: ", response.data); 
+        setBookedRoom(response.data);
       })
       .catch((error) => {
         console.error("Error fetching booked room details:", error);
       });
   }, [convertedType]);
-  console.log(rooms);
+
   const { startDate, endDate, adults, childrenCount, childAges, totalDays } =
     useContext(BookingContext);
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate).getTime();
+      const end = new Date(endDate).getTime();
 
-  const handleCheckAvailability = () => {
-    
-  };
+      const availableRooms = rooms.filter((room) => {
+        const definedCapacity = JSON.parse(room.capacity);
+        const definedAdult = parseInt(definedCapacity.Adult);
+        const definedChild = parseInt(definedCapacity.Child);
+        if (adults > definedAdult || childrenCount > definedChild) {
+          return false;
+        }
+        const isBooked = bookedRoom.some((booked) => {
+          const checkIn = new Date(booked.check_in).getTime();
+          const checkOut = new Date(booked.check_out).getTime();
+          return room.r_id === booked.r_id && start < checkOut && end > checkIn;
+        });
+        return !isBooked;
+      });
 
+      setFilteredRooms(availableRooms);
+    } else {
+      setFilteredRooms(rooms);
+    }
+  }, [startDate, endDate, rooms, bookedRoom,adults,childrenCount]);
+  
   return (
     <div>
       <Nav />
@@ -88,40 +111,54 @@ export default function room_list() {
           {roomDes.description}
         </p>
       </div>
-      <CheckAvailability handleCheckAvailability={handleCheckAvailability} />
+      <CheckAvailability/>
       {isRoom ? (
         <div className="mb-5">
-          {rooms.map((data) => {
-            const roomName = data.type
-              ? `${data.type.charAt(0).toUpperCase() + data.type.slice(1)} nm ${
-                  data.r_name
-                }`
-              : "";
-            const image = data.image ? JSON.parse(data.image) : null;
-            const firstImage = image ? image[0] : null;
-            const bedD = JSON.parse(JSON.parse(data.bed_details));
-            const bedDetails = bedD ? bedD[0] : null;
-            const Capacity = JSON.parse(data.capacity);
-            const capacityDetails = `${Capacity.Adult} Adult & ${Capacity.Child} Child`;
-            return (
-              <RoomViewer
-                type={type}
-                id={data.r_id}
-                name={roomName}
-                price={data.price}
-                image={firstImage}
-                bed={bedDetails}
-                capacity={capacityDetails}
-              />
-            );
-          })}
+          {filteredRooms.length > 0 ? (
+            filteredRooms.map((data) => {
+              const roomName = data.type
+                ? `${
+                    data.type.charAt(0).toUpperCase() + data.type.slice(1)
+                  } nm ${data.r_name}`
+                : "";
+              const image = data.image ? JSON.parse(data.image) : null;
+              const firstImage = image ? image[0] : null;
+              const bedD = JSON.parse(JSON.parse(data.bed_details));
+              const bedDetails = bedD ? bedD[0] : null;
+              const capacityDetails = JSON.parse(data.capacity);
+
+              return (
+                <RoomViewer
+                  key={data.r_id}
+                  type={type}
+                  id={data.r_id}
+                  name={roomName}
+                  price={data.price}
+                  image={firstImage}
+                  bed={bedDetails}
+                  capacity={`${capacityDetails.Adult} Adult & ${capacityDetails.Child} Child`}
+                />
+              );
+            })
+          ) : (
+            <div className="container text-center my-5">
+              <div className="row d-flex justify-content-center">
+                <div className="col-10 col-md-4">
+                  <img src={notFound} alt="" className="w-100" />
+                  <h2 style={{ color: "#05062d" }}>
+                    Sorry, no rooms available!
+                  </h2>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="container text-center my-5">
           <div className="row d-flex justify-content-center">
             <div className="col-10 col-md-4">
               <img src={notFound} alt="" className="w-100" />
-              <h2 style={{ color: "#05062d" }}>Sorry No rooms available!</h2>
+              <h2 style={{ color: "#05062d" }}>Sorry, no rooms available!</h2>
             </div>
           </div>
         </div>

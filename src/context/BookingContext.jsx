@@ -3,8 +3,8 @@ import React, { createContext, useState, useEffect } from "react";
 export const BookingContext = createContext();
 
 export const BookingProvider = ({ children }) => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDateState] = useState(new Date());
+  const [endDate, setEndDateState] = useState(null);
   const [adults, setAdults] = useState(1);
   const [childrenCount, setChildrenCount] = useState(0);
   const [childAges, setChildAges] = useState([]);
@@ -12,6 +12,21 @@ export const BookingProvider = ({ children }) => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [pkCost, setPkCost] = useState(0);
   const [currentStep, setCurrentStep] = useState(1);
+
+  const setStartDate = (date) => {
+    if (endDate && date > endDate) {
+      setEndDateState(null); 
+    }
+    setStartDateState(date);
+  };
+
+  const setEndDate = (date) => {
+    if (startDate && date < startDate) {
+      setStartDateState(null);
+    }
+    setEndDateState(date);
+  };
+
   useEffect(() => {
     const savedDetails = localStorage.getItem("bookingDetails");
     if (savedDetails) {
@@ -27,8 +42,8 @@ export const BookingProvider = ({ children }) => {
         currentStep,
       } = JSON.parse(savedDetails);
 
-      setStartDate(new Date(startDate));
-      setEndDate(endDate ? new Date(endDate) : null);
+      setStartDateState(new Date(startDate));
+      setEndDateState(endDate ? new Date(endDate) : null);
       setAdults(adults);
       setChildrenCount(childrenCount);
       setChildAges(childAges);

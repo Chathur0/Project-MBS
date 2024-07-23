@@ -11,20 +11,25 @@ function RoomRequest() {
     axios
       .get("http://localhost:3000/api/pending-approval")
       .then((response) => {
-        const fetchedData = response.data.map((item) => ({
-          name: item.f_name,
-          roomNumber: `${
-            item.type.charAt(0).toUpperCase() + item.type.slice(1)
-          } nm ${item.r_name}`,
-          contactNumber: item.m_number,
-          bookedDate: new Date(item.b_date).toISOString().split("T")[0],
-          checkIn: new Date(item.check_in).toISOString().split("T")[0],
-          checkOut: new Date(item.check_out).toISOString().split("T")[0],
-          package: item.package,
-          totalPayment: `${item.b_cost} LKR`,
-          slip: `http://localhost:3000/slip/${item.b_slip}`,
-          id: item.b_id,
-        }));
+        const fetchedData = response.data.map((item) => {
+          const bDate = new Date(item.b_date)
+          const iDate = new Date(item.check_in)
+          const oDate = new Date(item.check_out)
+          return {
+            name: item.f_name,
+            roomNumber: `${
+              item.type.charAt(0).toUpperCase() + item.type.slice(1)
+            } nm ${item.r_name}`,
+            contactNumber: item.m_number,
+            bookedDate: `${bDate.getFullYear()}-${(bDate.getMonth() + 1)}-${bDate.getDate()}`,
+            checkIn: `${iDate.getFullYear()}-${(iDate.getMonth() + 1)}-${iDate.getDate()}`,
+            checkOut: `${oDate.getFullYear()}-${(oDate.getMonth() + 1)}-${oDate.getDate()}`,
+            package: item.package,
+            totalPayment: `${item.b_cost} LKR`,
+            slip: `http://localhost:3000/slip/${item.b_slip}`,
+            id: item.b_id,
+          };
+        });
         setRoomRequestsData(fetchedData);
       })
       .catch((error) => {
@@ -35,7 +40,7 @@ function RoomRequest() {
   const filteredRequests = roomRequestsData.filter(
     (request) =>
       request.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.contactNumber.includes(searchQuery)
+      request.roomNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSlipClick = (slip) => {
@@ -104,7 +109,7 @@ function RoomRequest() {
             <input
               type="text"
               className="form-control w-100"
-              placeholder="Search by User Name or Mobile Number"
+              placeholder="Search by User Name or Room Number"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

@@ -15,6 +15,7 @@ import Package from "/icons/delivery.png";
 import OccupancyAlert from "../components/OccupancyAlert";
 import Success from "/icons/Success.mp4";
 import Contact from "/icons/ContactUs.mp4";
+import Booked from "/icons/booked.mp4";
 
 export default function BookingProcess() {
   const { type, id } = useParams();
@@ -25,19 +26,37 @@ export default function BookingProcess() {
   const [formattedEndDate, setFormattedEndDate] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+
+  const [bookedDetails, setBookedDetails] = useState([]);
+  const [availabilityMessage, setAvailabilityMessage] = useState([]);
+
+  const {
+    startDate,
+    endDate,
+    adults,
+    childrenCount,
+    childAges,
+    totalDays,
+    selectedPackage,
+    handlePackageSelect,
+    pkCost,
+    currentStep,
+    setCurrentStep,
+  } = useContext(BookingContext);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       axios
         .get("http://localhost:3000/checkToken", {
           headers: { Authorization: `Bearer ${token}` },
-        }) 
+        })
         .then((res) => {
           if (res.data.valid) {
             setUser({ userId: res.data.userId, name: res.data.name });
           } else {
             alert("your are not a authorized user");
-            navigate('/login');
+            navigate("/login");
           }
         })
         .catch((err) => {
@@ -48,6 +67,30 @@ export default function BookingProcess() {
       navigate("/login");
     }
   }, []);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    setToday(
+      `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}`
+    );
+  }, []);
+
+  useEffect(() => {
+    if (startDate) {
+      const sDate = new Date(startDate);
+      const sYear = sDate.getFullYear();
+      const sMonth = sDate.getMonth() + 1;
+      const sDay = sDate.getDate();
+      setFormattedStartDate(`${sYear}-${sMonth}-${sDay}`);
+    }
+    if (endDate) {
+      const edDate = new Date(endDate);
+      const eYear = edDate.getFullYear();
+      const eMonth = edDate.getMonth() + 1;
+      const eDay = edDate.getDate();
+      setFormattedEndDate(`${eYear}-${eMonth}-${eDay}`);
+    }
+  }, [startDate, endDate]);
 
   const [roomDetails, setRoomDetails] = useState({
     roomNumber: "",
@@ -85,7 +128,40 @@ export default function BookingProcess() {
       .catch((error) => {
         console.error("Error fetching room details:", error);
       });
+
+    axios
+      .get(`http://localhost:3000/api/booked-room-details?roomId=${id}`)
+      .then((response) => {
+        setBookedDetails(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching booked room details:", error);
+      });
   }, [id]);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate).getTime();
+      const end = new Date(endDate).getTime();
+      const conflictingBookings = bookedDetails.filter((booking) => {
+        const checkIn = new Date(booking.check_in).getTime();
+        const checkOut = new Date(booking.check_out).getTime();
+        return start < checkOut && end > checkIn;
+      });
+
+      if (conflictingBookings.length > 0) {
+        const message = conflictingBookings.map((booking) => {
+          const checkIn = new Date(booking.check_in).toLocaleDateString();
+          const checkOut = new Date(booking.check_out).toLocaleDateString();
+          return `Booked from ${checkIn} to ${checkOut}`;
+        });
+        setAvailabilityMessage(message);
+      } else {
+        setAvailabilityMessage("");
+      }
+    }
+  }, [startDate, endDate, bookedDetails]);
+
   const [fileUrl, setFileUrl] = useState(null);
   const handleSlipChange = (event) => {
     const file = event.target.files[0];
@@ -93,34 +169,6 @@ export default function BookingProcess() {
     const url = URL.createObjectURL(file);
     setFileUrl(url);
   };
-
-  const {
-    startDate,
-    endDate,
-    adults,
-    childrenCount,
-    childAges,
-    totalDays,
-    selectedPackage,
-    handlePackageSelect,
-    pkCost,
-    currentStep,
-    setCurrentStep,
-  } = useContext(BookingContext);
-  useEffect(() => {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split("T")[0];
-    setToday(formattedDate);
-  }, []);
-
-  useEffect(() => {
-    const stDate = startDate.toISOString().split("T")[0];
-    setFormattedStartDate(stDate);
-    if (endDate) {
-      const edDate = endDate.toISOString().split("T")[0];
-      setFormattedEndDate(edDate);
-    }
-  }, [startDate, endDate]);
 
   const handleNext = () => {
     if (currentStep < 3) {
@@ -171,16 +219,7 @@ export default function BookingProcess() {
         (ageBelowCount * pkCost) / 2
     );
   }, [adults, pkCost, ageAboveCount, ageBelowCount, roomDetails.pricePerDay]);
-  const handleCheckAvailability = () => {
-    alert(
-      `Check-in: ${startDate.toDateString()}\n` +
-        `Check-out: ${endDate ? endDate.toDateString() : "N/A"}\n` +
-        `Adults: ${adults}\n` +
-        `Children: ${childrenCount}\n` +
-        `Total Days: ${totalDays}\n` +
-        `Child Ages: ${childAges.join(", ")}`
-    );
-  };
+
   const areChildAgesIncomplete = () => {
     return childAges.some(
       (age) => age === null || age === undefined || age === ""
@@ -299,8 +338,8 @@ export default function BookingProcess() {
     }
       `}</style>
       <Nav />
-      <Modal show={showMessage} >
-        <Modal.Header >
+      <Modal show={showMessage}>
+        <Modal.Header>
           <Modal.Title style={{ color: "#05062d" }}>
             {bookingSuccess ? "Thank you!" : "Booking Failed"}
           </Modal.Title>
@@ -431,10 +470,8 @@ export default function BookingProcess() {
             <h3 className="mt-5 fw-bolder" style={{ color: "#05062d" }}>
               Confirm Room & Days
             </h3>
-            <div className="mt-5">
-              <CheckAvailability
-                handleCheckAvailability={handleCheckAvailability}
-              />
+            <div className="mt-5 text-start">
+              <CheckAvailability />
             </div>
             {adults > capacityAdult || childrenCount > capacityChild ? (
               <OccupancyAlert />
@@ -791,14 +828,20 @@ export default function BookingProcess() {
             </div>
             <div className="text-start mt-5 d-flex align-items-center gap-3">
               <div>
-                <a
-                  href="https://karuna.lk/program/socnf.html"
-                  className="btn btn-custom"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Proceed to Payment
-                </a>
+                {availabilityMessage.length > 0 ? (
+                  <button className="btn btn-custom" disabled>
+                    Proceed to Payment
+                  </button>
+                ) : (
+                  <a
+                    href="https://karuna.lk/program/socnf.html"
+                    className="btn btn-custom"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Proceed to Payment
+                  </a>
+                )}
               </div>
               <div className="d-flex">
                 <button className="btn btn-custom1 d-flex align-items-center gap-2">
@@ -813,6 +856,7 @@ export default function BookingProcess() {
                     top: "5px",
                     left: "-210px",
                     opacity: "0",
+                    cursor: "pointer"
                   }}
                   onChange={handleSlipChange}
                 />
@@ -880,7 +924,11 @@ export default function BookingProcess() {
               <div className="col-12 col-md-4 text-md-end text-center mt-2 mt-md-0">
                 <button
                   className="btn btn-custom "
-                  disabled={!isChecked || !selectedSlip}
+                  disabled={
+                    !isChecked ||
+                    !selectedSlip ||
+                    availabilityMessage.length > 0
+                  }
                   onClick={handleBookingSubmit}
                 >
                   Confirm Payment
@@ -889,6 +937,25 @@ export default function BookingProcess() {
             </div>
           </div>
         )}
+        <div>
+          {availabilityMessage.length > 0 && (
+            <div
+              style={{ color: "red" }}
+              className="container my-5 d-flex justify-content-center fw-bolder"
+            >
+              <div className="col-12 col-md-6  rounded  border p-3">
+                <h4 style={{ color: "#05062d" }} className="fw-bold">
+                  Room Already Booked
+                </h4>
+                <video src={Booked} className="w-75" autoPlay loop />
+
+                {availabilityMessage.map((message, index) => (
+                  <div key={index}>{message}</div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       <Footer />
     </div>
