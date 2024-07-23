@@ -4,12 +4,11 @@ import profile from "/nav&footer/profile.png";
 import {} from "bootstrap/dist/css/bootstrap.min.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
-
 function Nav() {
+  
   const [auth, setAuth] = useState(false);
   const [user, setUser] = useState({ userId: "", name: "" });
   const [isAdmin, setIsAdmin] = useState(false);
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -32,7 +31,6 @@ function Nav() {
       setAuth(false);
     }
   }, []);
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
@@ -48,44 +46,45 @@ function Nav() {
       })
       .catch((err) => console.log(err));
   }, []);
-
   return (
     <div>
       <style>
         {`
-        .navLink {
-          color: #05062d;
-        }
-        .navLinkEffect::after {
-          content: '';
-          width: 0%;
-          height: 2px;
-          background: #05062d;
-          display: block;
-          margin: auto;
-          transition: 0.5s;
-        }
-        .navLinkEffect:hover::after {
-          width: 100%;
-        }
-        .invisible {
-          display: none;
-        }
-        .visible {
-          display: block;
-        }
-        `}
+  .navLink{
+    color: #05062d;
+  }
+  .navLinkEffect::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #05062d;
+    display: block;
+    margin: auto;
+    transition: 0.5s;
+}
+.navLinkEffect:hover::after {
+  width: 100%;
+}
+.invisible{
+  display: none;
+}
+.visible{
+  display: block;
+}
+  `}
       </style>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container-fluid">
-          <Link to="/" className="navbar-brand d-flex align-items-center gap-1">
+          <a className="navbar-brand d-flex align-items-center gap-1" href="#">
             <img src={logo} alt="Logo" width="50" height="50" className="" />
-            <div className="fw-bold navLink">
-              METH BO SEWANA
-              <br />
-              Meditation Center
-            </div>
-          </Link>
+            <Link to="/" style={{ textDecoration: "none" }}>
+              <div className="fw-bold navLink">
+                METH BO SEWANA
+                <br />
+                Meditation Center
+              </div>
+            </Link>
+          </a>
           <button
             className="navbar-toggler"
             type="button"
@@ -127,6 +126,7 @@ function Nav() {
                 <Link
                   to="/program"
                   className="nav-link fw-bold navLink navLinkEffect"
+                  href="#"
                 >
                   Program
                 </Link>
@@ -143,6 +143,7 @@ function Nav() {
                 <Link
                   to="/volunteer-page"
                   className="nav-link fw-bold navLink navLinkEffect"
+                  href="#"
                 >
                   Volunteer
                 </Link>
@@ -151,6 +152,7 @@ function Nav() {
                 <Link
                   to="/product-home"
                   className="nav-link fw-bold navLink navLinkEffect"
+                  href="#"
                 >
                   Product
                 </Link>
@@ -176,9 +178,11 @@ function Nav() {
                 }`}
               >
                 <Link to="/Profile">
-                  <img src={profile} alt="Profile" width="50" />
+                  <img src={profile} alt="" width="50" />
                 </Link>
-                <div className="fw-bold">{user.name}</div>
+                <div className="fw-bold">{`${
+                  auth ? user.name : "Chathuranga"
+                }`}</div>
               </div>
             </div>
           </div>
