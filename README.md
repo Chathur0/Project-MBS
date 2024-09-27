@@ -1,8 +1,15 @@
-# React + Vite
+# MBS Meditation Center
+This project is a comprehensive web application developed for MBS Meditation Center, offering four key services:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Accommodation Management: 
+Admins can manage accommodations, while users can book them online.
+# Programs: 
+Admins can manage upcoming and past meditation programs, and users can register for them by making payments.
+# Volunteer Management: 
+Users can sign up as volunteers, and admins have control over volunteer registration and management.
+# Product Management: 
+Admins can update product details and inventory, and users can place orders for available products.
 
-Currently, two official plugins are available:
+## The system features user authentication, payment processing, and database management to handle bookings, registrations, and product orders.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
